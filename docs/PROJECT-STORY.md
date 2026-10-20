@@ -4,12 +4,60 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — The budget question, answered: switchable or nothing** (below)
+1. **2026-10-20 — Control solved, and a number keeps appearing** (below)
+2. **2026-10-20 — The budget question, answered: switchable or nothing**
 2. **2026-10-20 — Conflicts found: the minimal-cell route is wrong**
 3. **2026-10-20 — The checklist exists: 37 capabilities**
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — Control solved, and a number keeps appearing
+
+Record: [`protocol/regulatory-capacity-v1.md`](../protocol/regulatory-capacity-v1.md).
+
+**The question.** The budget analysis said the chassis must carry 37 capabilities
+and switch on only what each product needs. That needs 37 independent switches.
+Do they exist?
+
+**Protein switches do not get there.** The field's own account of routine
+practice: *"most artificial networks still employ the same core set of TFs (for
+example **LacI, TetR and cI**)."* Three. The best engineered toolkits reach about
+twelve. And every protein regulator spends proteome the capabilities need.
+
+**CRISPR repression has a measured ceiling:** *"In E. coli, **CRISPRi cannot
+support more than about a dozen simultaneous gRNAs** before the fold repression
+of any individual gRNA drops below 10×."* The cause is not specificity —
+*"despite highly specific sgRNA-promoter binding, multiple sgRNAs still interfere
+with one another by **competing for dCas9**."*
+
+**CRISPR activation is the one that scales — and activation is what we need.**
+*"CRISPR-based activators, **unlike** CRISPR-based repressors, **scale well** with
+increasing gRNA competition."* Switching a capability *on* is activation. The
+modality the architecture requires is the modality that works.
+
+**The requirement was stated wrongly, and correcting it dissolves the problem.**
+Not 37 switches at once — **37 distinct addresses, 5–12 active**. Addresses are
+RNA sequences, so there are effectively unlimited; and a dozen simultaneously
+active matches the measured ceiling. Both halves are supplied, with no margin.
+
+**Fourth architectural requirement: control must be nucleic-acid-addressed, not
+protein-addressed.**
+
+**The thing worth staring at.** Two unrelated analyses converged on the same
+number. The proteome budget says a product needs **5–12** capabilities at once.
+The regulatory ceiling is **about a dozen** guides. Both are shared-resource
+competition problems, so a common cause is plausible. If it is real, **twelve may
+be the natural width of an engineered cell**, and the chassis should be designed
+around that number rather than against it.
+
+**Weakest link, stated plainly:** the claim that CRISPRa scales better comes from
+**modelling**, not from an experiment that pushed activation to its limit. The
+largest real multiplex found was ten genes silenced at once in *Legionella*.
+Nobody has demonstrated 37 addressable capabilities in one organism. Cumulative
+leak across 37 silent capabilities is unquantified and could be the real ceiling.
 
 ---
 
