@@ -4,9 +4,44 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — The target is a universal chassis** (below)
-2. **2026-10-20 — How we got here, and what HostMatch is**
-3. **2026-10-17 — The big database does not have what we needed**
+1. **2026-10-20 — The checklist exists: 37 capabilities** (below)
+2. **2026-10-20 — The target is a universal chassis**
+3. **2026-10-20 — How we got here, and what HostMatch is**
+4. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — The checklist exists: 37 capabilities
+
+Short entry. The record itself is the file, not this summary.
+
+**What was built:** [`protocol/capability-set-v1.md`](../protocol/capability-set-v1.md)
+and [`protocol/capabilities-v1.tsv`](../protocol/capabilities-v1.tsv).
+
+**37 capabilities in 7 categories** — 15 binary (you have it or you don't),
+22 graded (a matter of how much): genetic expression (6), protein maturation (7),
+catalysis and cofactors (5), precursor supply (5), compartments and membranes (4),
+tolerance and robustness (4), process and deployment (6).
+
+**The rule used to decide what goes on the list:** a capability is included only
+if the literature names it as something that *blocks production when absent*. Not
+"would be nice." Every entry carries the quote that put it there.
+
+**The surprise:** tolerance — surviving your own product — turns out to be a
+first-class blocker, not an afterthought. Recent work repeatedly finds it is the
+binding constraint rather than the pathway: *"Genome-scale overexpression
+screening identifies product tolerance and efflux transport as key determinants
+of high-level production."* It had not been on my mental list before the search.
+
+**Not done, and listed in the file itself:** no host has been scored against any
+of the 37. There is no weighting. **There is no conflict map** — nobody has
+checked whether any two capabilities are mutually exclusive, and if they are,
+universality is impossible on physical grounds. That is the most important
+unanswered question in the project. The evidence quotes are from abstracts, not
+full papers.
+
+**Decision recorded:** inclusion requires documented blocking evidence, not
+plausibility. This keeps the list defensible and stops it growing without limit.
 
 ---
 
