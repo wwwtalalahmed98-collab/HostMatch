@@ -116,11 +116,23 @@ Being usable outside a research lab.
 
 ## Count
 
-**35 capabilities across 7 categories.**
+**37 capabilities across 7 categories** — 15 binary (you have it or you don't),
+22 graded (a matter of how much).
+
+| Category | Capabilities |
+|---|---:|
+| A. Genetic expression | 6 |
+| B. Protein maturation | 7 |
+| C. Catalysis and cofactors | 5 |
+| D. Precursor supply | 5 |
+| E. Compartments and membranes | 4 |
+| F. Tolerance and robustness | 4 |
+| G. Process and deployment | 6 |
+| **Total** | **37** |
 
 That number is the point. It is finite, it is scoreable, and it converts
 "universal" into a testable claim: *does any host, with a bounded set of
-additions, cover all 35?*
+additions, cover all 37?*
 
 ## What this version does not yet have
 
