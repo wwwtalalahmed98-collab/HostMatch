@@ -181,6 +181,19 @@ preference. It is also testable: if someone demonstrates a single-compartment
 chassis performing both oxygen-requiring and oxygen-destroyed chemistry, the
 argument fails.
 
+## Conflict 6 — regulatory capacity (raised by the proteome analysis, now resolved)
+
+Switchable capabilities need independent switches. Protein regulators top out
+around 12-20 and each costs proteome; CRISPR *repression* has a measured ceiling
+of *"about a dozen simultaneous gRNAs"*. But CRISPR *activation* - the modality
+actually required - is documented to *"scale well with increasing gRNA
+competition"*, and its addresses are nucleic-acid sequences rather than proteins,
+so the address space is effectively unlimited.
+
+Resolved, with no margin. Full analysis in `regulatory-capacity-v1.md`.
+
+---
+
 ## What is not done
 
 - **661 of 666 capability pairs have not been examined.** Five were chosen
