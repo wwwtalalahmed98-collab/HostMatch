@@ -4,10 +4,60 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — The checklist exists: 37 capabilities** (below)
-2. **2026-10-20 — The target is a universal chassis**
-3. **2026-10-20 — How we got here, and what HostMatch is**
-4. **2026-10-17 — The big database does not have what we needed**
+1. **2026-10-20 — Conflicts found: the minimal-cell route is wrong** (below)
+2. **2026-10-20 — The checklist exists: 37 capabilities**
+3. **2026-10-20 — The target is a universal chassis**
+4. **2026-10-20 — How we got here, and what HostMatch is**
+5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — Conflicts found: the minimal-cell route is wrong
+
+The record is [`protocol/conflict-map-v1.md`](../protocol/conflict-map-v1.md).
+This entry is the summary and the decision.
+
+**The question asked:** are any two of the 37 capabilities mutually exclusive? If
+yes, universality is impossible on physical grounds and the project's answer is a
+proof of impossibility rather than a design.
+
+**Answer: two hard conflicts, both physical, both irreversible.**
+
+1. **Oxygen.** Cytochrome P450 enzymes — which do most plant drug chemistry —
+   require molecular oxygen. Nitrogenase, [FeFe]-hydrogenases and radical SAM
+   enzymes are *"**irreversibly inactivated** within a few minutes after exposure
+   to oxygen."* One host cannot do both in one place at one time.
+2. **Redox state.** Disulfide bonds need an oxidising environment. *"Both
+   eukaryotic and prokaryotic organisms **keep their cytoplasm reduced** and,
+   consequently, disulfide bond formation is impaired."*
+
+**Both resolve the same way, and only that way: separate internal compartments.**
+Proven in nature (cyanobacteria sequester nitrogenase in micro-oxic cells) and in
+engineering (*"a functional oxygen-labile nitrogenase component in the
+mitochondrial matrix of aerobically grown yeast"*).
+
+**So compartmentalisation is not one capability among 37. It is the enabling
+condition for universality.** A single-compartment cell cannot be universal.
+
+**The finding that overturns the obvious route.** The intuitive path is to start
+from a minimal cell — a clean slate — and add capabilities. JCVI-syn3.0, the
+field's flagship *"versatile platform"*, is exactly that. The evidence says
+minimisation destroys what universality needs: *"substantial loss of cell
+fitness"*, *"decreased growth rate and metabolic imbalances"*, *"oxidative stress
+sensitivity"*, and *"in many cases no performance improvements with the
+streamlined chassis were obtained."* The capabilities lost are precisely stress
+response, growth rate, genetic stability and culture-condition range.
+
+**Decision recorded: do not pursue the minimal-cell route.** Minimisation and
+universality pull in opposite directions. The argument points instead toward
+compartmentalised, robust organisms — in practice eukaryotes, or bacteria
+engineered to acquire compartments. This closes off the most obvious starting
+point in the field, deliberately, on evidence.
+
+**Coverage, stated honestly: 5 of 666 capability pairs examined — 0.8%.** The
+five were chosen because they looked most likely to conflict. Absence of other
+conflicts means nobody looked, not that none exist. Quotes are from abstracts and
+have not been checked against full papers.
 
 ---
 
