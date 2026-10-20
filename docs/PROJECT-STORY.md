@@ -4,7 +4,146 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-17 — The big database does not have what we needed** (below)
+1. **2026-10-20 — How we got here, and what HostMatch is** (below)
+2. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — How we got here, and what HostMatch is
+
+## 1. Where we are
+
+We have a clear question, a repository, and no data yet. The next move is a small
+test designed to kill the idea cheaply if it deserves killing.
+
+## 2. What this project is, in one page
+
+A scientist has a protein they want to manufacture — insulin, an antibody, an
+industrial enzyme, a vaccine component. They cannot simply make it. They have to
+persuade something alive to make it for them.
+
+They get roughly five choices:
+
+| Choice | What it is like |
+|---|---|
+| **Bacteria** (*E. coli*) | Cheap and fast. Fails often on complicated proteins. |
+| **Yeast** | Slower, handles more complexity. |
+| **Insect cells** | More capable, more expensive. |
+| **Mammalian cells** | Handles almost anything. Slow and costly. |
+| **Cell-free** | A tube of extracted cell machinery. Nothing alive. |
+
+Pick wrong and you lose months and money. In practice almost nobody chooses —
+they try bacteria first, because that is what everyone does, and deal with
+failure afterwards.
+
+There are software tools meant to help. **Every single published one answers only
+one question: "will bacteria work?"** We checked seven of them. The literature
+says so about itself: *"they are all optimized for the expression host
+Escherichia coli."*
+
+**Nobody has built the tool that answers the actual question: which one should I
+use?**
+
+## 3. Why nobody has built it
+
+Because of what you would need to learn from.
+
+To learn which host suits which protein, you need records of **the same protein
+tried in several hosts**. Almost nobody publishes that. A lab tries one host; it
+works or it does not; they publish the one that worked. The failures and the
+alternatives go unrecorded.
+
+So the project is really this: **find the rare cases where someone did try the
+same protein in several hosts, gather them into one place for the first time,
+and see whether a pattern comes out.**
+
+That gathering is the hard part and the real contribution. The model is what you
+build on top to show the gathering was worth doing.
+
+## 4. How we arrived at this idea
+
+This did not start here. It started with wanting a project for HTGAA, an MIT
+synthetic biology course. Four ideas were considered seriously and dropped. The
+reasons matter, because each one taught us the test the next idea had to pass.
+
+| Idea | What it was | Why it was dropped |
+|---|---|---|
+| **Klebsiella phage enzymes** | Design the enzymes needed to manufacture a vaccine against bacterial types common in Pakistan | It was shaped by what was already on the CV rather than by a gap in the field. A 2026 paper in *PLoS Medicine* had also partly occupied the ground. |
+| **Algal cell-free systems** | Make proteins in a tube using machinery extracted from algae | The platform does not exist. Nobody has built one. Building it is one to three years of laboratory work. |
+| **Cold-chain-free biologics** | Medicines that survive without refrigeration | A 2026 paper in *ACS Synthetic Biology* had already done the central piece — using tardigrade proteins to store cell-free systems. |
+| **Auditing vaccine-design papers** | Checking whether thousands of computational vaccine papers hold up | A real and open gap, but it is auditing rather than building, and that was not the work wanted. |
+
+Then the idea came from the owner, not from me: *an AI model of host organisms
+that could produce anything.* Tested against the literature, it turned out to
+name a gap the field states about itself. That became HostMatch.
+
+**The lesson that survived all four rejections:** a gap you *measure* is durable;
+a gap you *infer from not finding a paper* is fragile. Three of the four above
+died because the gap was inferred and turned out to be filled.
+
+## 5. Where the data will come from
+
+Two sources, both small, neither extracted yet.
+
+- **Seven published comparison studies** — roughly 1,400 paired observations.
+  These are the careful ones: a single lab deliberately running the same set of
+  proteins through several hosts and reporting all the results, failures
+  included.
+- **TargetTrack** — roughly 989 verified records, dug out of a 350,000-protein
+  government archive. Checked on 17 October; the archive turned out to be 99.2%
+  bacteria, so only this small corner is usable, and every label still needs a
+  human to confirm it.
+
+Total: about **2,400 paired observations**. That is enough to attempt, not enough
+to be confident. Stated plainly because it is the central risk.
+
+## 6. The diagram
+
+```mermaid
+flowchart TD
+    A["You have a protein<br/>to manufacture"] --> B{"Which host<br/>should make it?"}
+    B --> C["Bacteria"]
+    B --> D["Yeast"]
+    B --> E["Insect cells"]
+    B --> F["Mammalian cells"]
+    B --> G["Cell-free"]
+    C --> H["Every published tool<br/>answers only this one"]
+    D --> I["HostMatch<br/>ranks all five"]
+    E --> I
+    F --> I
+    G --> I
+    C --> I
+    style H fill:#7f1d1d,stroke:#991b1b,color:#ffffff
+    style I fill:#0f766e,stroke:#115e59,color:#ffffff
+```
+
+*Dark red is the limit of what exists today. Teal is what we are building, and it
+does not exist yet.*
+
+## 7. What is next
+
+A **pilot built to fail fast**. Extract only the two freely available papers —
+about 160 to 280 paired observations — and ask one question: once you account for
+which protein it is, does the host still explain anything?
+
+If protein difficulty explains everything and the host adds nothing, the tool has
+nothing to say and we stop. Finding that out in two weeks instead of two months
+is the entire purpose of running a pilot first.
+
+## 8. Decisions made, and why
+
+| We chose | We chose against | Why |
+|---|---|---|
+| A pilot on two free papers | Writing the full protocol first, then curating everything | The pilot tests the three riskiest assumptions at once. A protocol written in the abstract would be rewritten once real papers forced different decisions. |
+| Test "does host matter at all" first | Testing extraction or sample size first | If the host effect is small relative to how hard the protein is, nothing downstream matters. |
+
+## 9. Open question for the owner
+
+**Is this still an HTGAA course project, or your own research?** It has drifted
+toward the second. Keeping the course frame means the demonstration construct
+becomes real work and the course's requirements shape the scope. Dropping it
+means the dataset and model are the whole point, and a separate, simpler project
+is needed for the course in January.
 
 ---
 
