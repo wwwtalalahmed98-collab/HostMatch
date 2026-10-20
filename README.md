@@ -3,7 +3,7 @@
 Building the first harmonised, paired protein-host expression outcome dataset,
 and a model that recommends an expression chassis from protein sequence.
 
-**Status:** Phase 0 - protocol. No extraction has begun.
+**Status:** goal reset to a universal chassis. See docs/PROJECT-STORY.md.
 
 Every expression predictor in the literature is E. coli-only. This project
 asks which host to use, not whether E. coli will work.

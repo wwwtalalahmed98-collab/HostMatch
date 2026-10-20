@@ -4,8 +4,143 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — How we got here, and what HostMatch is** (below)
-2. **2026-10-17 — The big database does not have what we needed**
+1. **2026-10-20 — The target is a universal chassis** (below)
+2. **2026-10-20 — How we got here, and what HostMatch is**
+3. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — The target is a universal chassis
+
+## 1. Where we are
+
+The owner has reset the goal. We are no longer building a tool that *chooses
+between* existing hosts. We are working toward **one host that can make
+anything** — and the first job is to define what that sentence actually means.
+
+## 2. What changed, and why I was wrong
+
+HostMatch — predicting which of five existing hosts suits a given protein — was
+a narrowing of the owner's original idea, and I made it without flagging that I
+had narrowed it. The original idea was to **build or design a host that produces
+any product in biotechnology.** Choosing between hosts and building a better host
+are different projects. The owner was right to stop it.
+
+## 3. What the field calls this
+
+It has a name: **universal chassis**, also "plug-and-play chassis" or
+"super-chassis". It is a live, funded ambition. Nobody has one.
+
+| Built already | What it is |
+|---|---|
+| **JCVI-syn3.0** | A bacterium stripped to 473 genes — the smallest self-replicating cell ever made. Its creators call it *"a versatile platform."* Built by **John Glass, who teaches HTGAA Week 12.** |
+| **Streptomyces super-chassis** (2024) | *"a versatile plug-and-play super-chassis and a universal pipeline"* — for secondary metabolites |
+| **Pichia plug-and-play factory** (2025) | Universal — for terpenoids |
+| **PLUG-IN photosynthetic chassis** (2026) | Universal — for photosynthetic products |
+
+**The pattern nobody states outright:** every "universal" chassis actually built
+is universal *within one product class*. Universal-for-everything has not been
+attempted publicly. That is either a real biological limit or an unclaimed
+ambition, and establishing which is itself a result.
+
+## 4. Why no universal host exists — and the barrier that is falling
+
+**Post-translational modifications.** Bacteria cannot attach sugar chains to
+proteins and handle disulfide bonds poorly. This is the main reason complex
+proteins need insect or mammalian cells.
+
+**But this is being engineered away, host by host:**
+
+- *"Construction of an Escherichia coli chassis for efficient biosynthesis of
+  human-like N-linked glycoproteins"* (2024) — a bacterium making human-style
+  sugar chains
+- *"Humanization of Yeasts for Glycan-Type End-Products"* (2022)
+- Human biantennary glycans engineered into *Komagataella phaffii* (2026)
+
+**The growth-versus-production conflict.** *"The inherent conflict between
+cellular growth and product synthesis, arising from limited resource allocation
+and metabolic burden, fundamentally constrains the performance of microbial
+chassis"* (2026). A cell making your product is a cell not making more of itself.
+No clean solution exists.
+
+**Parts do not port between hosts**, and **the genetic code is fixed** — though
+engineered tRNA synthetases are expanding it.
+
+## 5. The reframe that makes this workable
+
+"Produce everything" cannot be worked on. "Cover every capability" can.
+
+A universal chassis does not need to make every molecule. It needs every
+**ability** that molecules require. Those are enumerable:
+
+| Product class | Capabilities it demands |
+|---|---|
+| Proteins | folding, disulfide bonds, glycosylation, secretion, protease balance |
+| Small molecules | precursor supply, cofactor regeneration, membrane enzymes, tolerance to toxic products |
+| Nucleic acids | polymerases, capping, modified nucleotides |
+| Materials | polymerisation, assembly, export |
+
+**Universality = covering the capability set.** That makes the goal countable,
+scoreable, and testable — which "everything" never could be.
+
+## 6. The diagram
+
+```mermaid
+flowchart TD
+    A["Everything biotechnology makes<br/>proteins, drugs, materials, RNA"] --> B["The capabilities those demand<br/>folding, glycosylation, precursors"]
+    B --> C["What each host already has<br/>scored from its genome"]
+    C --> D{"Can one host<br/>cover them all?"}
+    D -->|"yes"| E["Design specification<br/>what to add, to which host"]
+    D -->|"no"| F["Proof it cannot be done<br/>also a real result"]
+    style E fill:#0f766e,stroke:#115e59,color:#ffffff
+    style F fill:#854f0b,stroke:#633806,color:#ffffff
+```
+
+*Both endings are publishable. That is deliberate — the project has a good
+failure mode.*
+
+## 7. The honest scale problem
+
+JCVI took roughly twenty years and tens of millions of dollars to build one
+minimal cell — and that cell makes nothing useful yet. It is a research platform.
+
+**Building a universal chassis is a multi-decade, multi-laboratory, wet-lab
+programme.** The owner has a laptop and no reagents. This is not a reason to drop
+the goal. It is a reason to be exact about what the first contribution is.
+
+## 8. The first contribution
+
+**A capability atlas.** For every host and every capability: what it has, what it
+lacks, who has engineered the missing piece in, and how well that worked.
+
+Nobody has assembled this. The field knows the barriers in words — "bacteria
+can't glycosylate", "yeast glycans are wrong" — but there is no computable map.
+
+It is dry-lab, it is buildable, and it is **the design document for the chassis
+itself**: you cannot build a universal host without first knowing the complete
+list of what you would have to add.
+
+## 9. Decisions made, and why
+
+| We chose | We chose against | Why |
+|---|---|---|
+| Universal chassis as the goal | HostMatch (choosing between existing hosts) | HostMatch was a narrowing of the owner's idea, made without flagging it. The owner reset it. |
+| "Everything" rather than "everything within a product class" | The achievable version | Owner's explicit choice. Higher risk of failure, and nobody has attempted it publicly. |
+| Define universality as a **capability set** | A product list | A product list is infinite and untestable. A capability set is countable and scoreable. |
+| Capability atlas as the first build | Going straight at the chassis | The wet-lab work needs a laboratory. The atlas does not, and the chassis cannot be designed without it. |
+
+## 10. What could go wrong
+
+- **"Everything" may be physically impossible.** Products need conflicting
+  conditions — some anaerobic, some aerobic; some toxic to the host that must
+  make them. If the capability map shows irreconcilable conflicts, universality
+  is disproved. That is a genuine result, and the project is designed so that
+  outcome still counts as success.
+- **The atlas is a large curation job** and we have just learned from TargetTrack
+  how often the data you need is simply not recorded.
+- **It is not an HTGAA project.** This has moved decisively toward the owner's own
+  research. A separate, smaller project will be needed for the course in January
+  if the course is still wanted.
 
 ---
 
