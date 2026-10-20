@@ -4,11 +4,54 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — Conflicts found: the minimal-cell route is wrong** (below)
-2. **2026-10-20 — The checklist exists: 37 capabilities**
+1. **2026-10-20 — The budget question, answered: switchable or nothing** (below)
+2. **2026-10-20 — Conflicts found: the minimal-cell route is wrong**
+3. **2026-10-20 — The checklist exists: 37 capabilities**
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-20 — The budget question, answered: switchable or nothing
+
+Record: [`protocol/proteome-budget-v1.md`](../protocol/proteome-budget-v1.md),
+arithmetic reproducible via `python -I scripts/proteome_budget.py`.
+
+**The question that could have killed the project.** A cell has a finite protein
+budget. If 37 capabilities do not fit, universality is impossible and the project
+ends with a proof of impossibility.
+
+**The measured ceiling:** *"the maximum capacities of the cell for heterologous
+expression [are] … **33% of the total protein**"* in *E. coli*; yeast tolerates
+*"exceeding 40%"*. Roughly a third of the cell is available.
+
+**If all 37 were switched on at once**, every single one would have to cost under
+**1.08%** of the proteome. Fine for a capability that is one enzyme. Not fine for
+human-like glycosylation (a pathway plus sugar-nucleotide supply), P450 systems
+(enzyme plus redox partner plus membrane), or compartmentalisation (building
+organelles). **One or two expensive capabilities exhaust the budget alone.**
+
+**If the genes are carried silently and only the 5–12 a given product needs are
+switched on**, it fits — while a capability costs under about **2.8%**. That is
+demanding but not absurd.
+
+**Verdict: the budget does not kill the idea. It dictates the architecture.**
+The chassis carries everything and expresses only what the current product needs.
+This is the third architectural requirement, after *compartmentalised* and *not
+built from a minimal cell*.
+
+**New problem created by the answer.** Thirty-seven switchable capabilities need
+thirty-seven independent switches that do not interfere. The field already names
+that limit: *"the scale and complexity of genetic circuits are limited by a
+**shortage of composable, programmable, and orthogonal regulatory parts**."*
+**Control, not metabolism, may be the real ceiling.** Logged as conflict 6 and
+not yet quantified.
+
+**Honesty:** the per-capability cost is **swept, not measured** — nobody has
+published it. The conclusion holds across the whole plausible range, but it is an
+argument, not a measurement. The 5–12 figure is reasoned from the capability set,
+not from data. Costs are treated as additive, which they may not be.
 
 ---
 
