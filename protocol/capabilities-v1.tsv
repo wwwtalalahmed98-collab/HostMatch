@@ -1,0 +1,38 @@
+id	category	capability	type	blocks_when_absent	product_classes_needing_it
+A1	expression	Codon usage compatible with host tRNA pool	graded	Low or no translation	all
+A2	expression	Promoter function in host	binary	No transcription	all
+A3	expression	Translation initiation (RBS or Kozak)	graded	No translation	all
+A4	expression	Large coding sequence capacity	graded	Large proteins truncate or fail	proteins;materials
+A5	expression	Repetitive-sequence genetic stability	binary	Repeat-rich genes recombine out	materials
+A6	expression	Multi-gene cluster expression in balance	graded	Pathway flux imbalance	small_molecules
+B1	maturation	Folding and chaperone capacity	graded	Insoluble aggregates	proteins
+B2	maturation	Disulfide bond formation	binary	Misfolded protein	proteins
+B3	maturation	N-glycosylation present	binary	Aglycosylated product	proteins
+B4	maturation	Human-like N-glycan structure	binary	Wrong glycoform; immunogenic	proteins_therapeutic
+B5	maturation	O-glycosylation	binary	Missing modification	proteins
+B6	maturation	Other PTMs (phospho, lipidation, processing)	binary	Inactive product	proteins
+B7	maturation	Protease balance (product not degraded)	graded	Product degraded in situ	proteins;materials
+C1	cofactor	Heme biosynthesis and supply	binary	No P450 or heme-enzyme chemistry	small_molecules
+C2	cofactor	Functional cytochrome P450 expression	binary	Oxidation steps fail	small_molecules
+C3	cofactor	NADPH supply and regeneration	graded	Redox-limited pathway	small_molecules
+C4	cofactor	SAM supply	graded	Methylation steps fail	small_molecules
+C5	cofactor	Other cofactors (FAD, PLP, B12, Fe-S)	binary	Pathway-specific failure	small_molecules
+D1	precursor	Acetyl-CoA and malonyl-CoA pool	graded	Polyketide flux limited	small_molecules;materials
+D2	precursor	Isoprenoid precursors (MVA or MEP)	graded	Terpenoid flux limited	small_molecules
+D3	precursor	Shikimate pathway flux	graded	Aromatic flux limited	small_molecules
+D4	precursor	Amino acid pools	graded	Flux limited	all
+D5	precursor	Sugar-nucleotide pool	graded	Glycosylation cannot proceed	proteins_therapeutic
+E1	compartment	Membrane capacity for anchored enzymes	graded	P450s and membrane enzymes fail	small_molecules
+E2	compartment	Subcellular compartmentalisation	binary	Toxic intermediates not contained	small_molecules
+E3	compartment	Secretion capacity	graded	Product requires cell lysis to recover	proteins;materials
+E4	compartment	Export of large or repetitive proteins	binary	Product trapped intracellularly	materials
+F1	tolerance	Product toxicity tolerance	graded	Titre capped by self-poisoning	small_molecules
+F2	tolerance	Efflux transport of the product	binary	Intracellular accumulation inhibits pathway	small_molecules
+F3	tolerance	Stress response capacity	graded	Strain collapses at high titre	all
+F4	tolerance	Feedstock and substrate tolerance	graded	Cannot use cheap feedstocks	all
+G1	process	Growth rate and biomass accumulation	graded	Uneconomic productivity	all
+G2	process	Growth-production balance (burden)	graded	Growth and yield trade off	all
+G3	process	Genetic stability over generations	graded	Production lost during scale-up	all
+G4	process	Culture-condition range (O2, temp, salt)	graded	Incompatible with the product's needs	all
+G5	process	Demonstrated scale-up	binary	Research organism only	all
+G6	process	Safety and regulatory status	binary	Blocked from food and pharma use	all
