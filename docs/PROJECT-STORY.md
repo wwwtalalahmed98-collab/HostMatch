@@ -4,13 +4,62 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
-1. **2026-10-20 — Control solved, and a number keeps appearing** (below)
+1. **2026-10-21 — A candidate named: the rules choose yeast** (below)
+2. **2026-10-20 — Control solved, and a number keeps appearing**
 2. **2026-10-20 — The budget question, answered: switchable or nothing**
 2. **2026-10-20 — Conflicts found: the minimal-cell route is wrong**
 3. **2026-10-20 — The checklist exists: 37 capabilities**
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-21 — A candidate named: the rules choose yeast
+
+Record: [`protocol/candidate-assessment-v1.md`](../protocol/candidate-assessment-v1.md).
+
+**First output that is a proposal rather than a constraint.** Until now the work
+said what the chassis must *be*. This names an organism.
+
+**The rules eliminate before they select.** Requirements 1 and 2 -
+compartmentalised, and not stripped down - rule out every prokaryote
+(*E. coli*, *Bacillus*, *Vibrio*) and every minimal cell, **including
+JCVI-syn3.0**. That is the test of whether the rules do real work: not that they
+pick yeast, but that they reject the organisms the field favours.
+
+**Lead candidate: *Saccharomyces cerevisiae*.** Highest measured protein headroom
+of any host found - *"exceeding **40% of total protein**"* while still growing,
+against 33% for *E. coli*. Deepest compartment-engineering literature, including
+*"ML-enhanced peroxisome capacity"* compartmentalising **up to eight enzymes**
+and an orthogonal peroxisomal import system. A **facultative** oxygen
+metabolism, so the oxygen conflict can also be solved in time rather than only
+in space. And the decisive precedent: *"a functional **oxygen-labile
+nitrogenase** component in the **mitochondrial matrix of aerobically grown
+yeast**"* - conflict 1, already solved experimentally, in this organism.
+
+**Alternative kept: *Yarrowia lipolytica*** - the only candidate with
+simultaneous editing, repression *and* activation demonstrated together, and the
+only one reported as **more** robust after engineering rather than less.
+
+**The honest counterargument, recorded:** yeast is the obvious answer. Everyone
+uses it. The analysis should be suspected of walking to the nearest familiar
+choice.
+
+**The finding that matters more than the winner.** The four rules were derived
+abstractly - from oxygen chemistry, redox chemistry, published failures of genome
+minimisation, proteome arithmetic and regulator counts. **They said nothing about
+yeast.** Yet several independent groups are already engineering yeast peroxisomes
+into exactly the insulated compartments the rules demand. **The field is
+converging on this architecture without having written it down.** That is
+convergent evidence, not confirmation - but it is the strongest support the
+project has.
+
+**Not done:** no scoring against the individual 37 capabilities; tolerance
+unassessed for every candidate despite the literature calling it the usual
+binding constraint; *A. oryzae* and *K. phaffii* thinly covered, so their
+weakness may be my search coverage rather than their biology. **And the gap list
+does not exist** - the point of naming a candidate is to say what it still lacks.
 
 ---
 
