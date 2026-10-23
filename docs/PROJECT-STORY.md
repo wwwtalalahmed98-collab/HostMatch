@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-23 - Idea sharpened: proteins, and a data-driven design layer** (below)
 1. **2026-10-21 — A candidate named: the rules choose yeast** (below)
 2. **2026-10-20 — Control solved, and a number keeps appearing**
 2. **2026-10-20 — The budget question, answered: switchable or nothing**
@@ -12,6 +13,130 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-23 — The idea sharpened: proteins, and a design layer that reads data
+
+Record: [`protocol/scope-proteins-v1.md`](../protocol/scope-proteins-v1.md).
+Reproduce the filter with `python -I scripts/protein_scope.py`.
+
+**The idea was restated more precisely, and the restatement did two different
+things.** Narrower in the product: **any protein**, not any product in
+biotechnology. Wider in the deliverable: a **system that decides what to build
+from available data** — genomic, metabolomic, or genetic-circuit data — not just
+an organism.
+
+## What the narrowing removes
+
+Filtering the capability set to proteins: **22 of 37 required, 15 dropped.** Gone
+are the whole cofactor category, three of five precursor pathways, membrane
+capacity, toxic-intermediate compartmentalisation, toxicity tolerance and efflux.
+
+**This costs us the best evidence I gave on 2026-10-21.** Conflict 1 — the oxygen
+conflict — was a fight between **P450s needing oxygen** and **nitrogenase being
+destroyed by it**. Both are small-molecule capabilities. Both just dropped. The
+precedent I called decisive, *"a functional oxygen-labile nitrogenase component
+in the mitochondrial matrix of aerobically grown yeast"*, **no longer supports
+the design.** The candidate assessment's headline argument is weaker than I
+stated it.
+
+**Conflict 2 survives and is the protein one** — disulfide bonds need an
+oxidising compartment, and cytoplasm is reduced. So requirement 1
+(compartmentalised) holds, but for an ordinary reason: the compartment needed is
+the **ER and secretory pathway**, which every eukaryote already has. Less
+difficulty, and less novelty.
+
+## And it makes the arithmetic easy, which costs us two more requirements
+
+Of the 22, *S. cerevisiae* appears to have **17 natively**, leaving **5 to
+engineer**: large-CDS capacity, humanised N-glycans, sugar-nucleotide supply,
+extra secretion capacity, burden control. *This split is my judgement from
+abstracts, not a measurement.*
+
+| | break-even cost per capability |
+|---|---:|
+| 37 capabilities, constitutive | 1.08% of proteome |
+| 5 capabilities, constitutive | **8.0% of proteome** |
+
+**Requirement 3 (switchable) drops from necessary to merely useful** — the
+budget no longer forbids constitutive expression. **Requirement 4
+(nucleic-acid-addressed control) drops too** — five addresses are trivially
+reachable with ordinary protein regulators, so CRISPRa is no longer required.
+
+**Two of the four architectural requirements existed only because of the
+37-capability target.** Narrowing to proteins removed the pressure that created
+them. That is the honest consequence of a good clarification.
+
+## What the widening adds, and what data actually exists
+
+| Leg | Status |
+|---|---|
+| Sequence → solubility, statistical | Mature, **plateaued**, and almost entirely *E. coli* |
+| Mechanistic model → configuration | **Exists for yeast** (pcSecYeast) and is the right shape |
+| Closed-loop active learning | Demonstrated — but never on this problem |
+| Metabolomic input | **No data source identified** |
+
+On leg 1, the field says so itself: *"predictors … have **plateaued** (AUC 0.760
+→ ~0.80 over **eight years** of protein-language-model variants). The plateau
+hides a latent confound: **the centrifugation regime**"*. Eight years of bigger
+models bought four points, and a 2026 preprint blames how hard the tube was spun.
+**A bigger model will not fix this.**
+
+On leg 2: *"the **first proteome-constrained genome-scale protein secretory
+model** of a eukaryal cell … **pcSecYeast** … **identified overexpression
+targets**"* (*Nat Commun*, 2022). It takes a protein and says which genes to
+overexpress, in the lead organism, under a proteome constraint — the same
+constraint this project's budget work was built on.
+
+## The gap, and therefore the project
+
+**Nobody has connected leg 2 to leg 3.** A model that can propose a configuration
+exists. Methods that can test proposals cheaply exist. No published system closes
+the loop between them for arbitrary target proteins.
+
+> A chassis with five engineered switches, plus a decision layer that reads a
+> target sequence, asks a proteome-constrained secretory model where the
+> bottleneck will be, picks which switches to turn on, and corrects itself as
+> results come back.
+
+**This is software plus a defined wet-lab loop, not a new organism.** It is a
+far smaller and more achievable thing than what the project was pointed at
+yesterday, and it is closer to what was asked for.
+
+## The counter-evidence, stated plainly
+
+> ***"Structural Homology Fails to Predict Secretion Efficiency in Pichia
+> pastoris: Divergent Responses of Architecturally Similar scFvs to
+> Multi-Parametric Genetic Engineering"*** (2025)
+
+Two proteins that look alike behaved differently under identical engineering.
+**That is a direct negative result against a sequence-driven design layer.** It
+argues the loop must be iterative rather than predictive — which supports leg 3
+and undercuts leg 1. It is the most important paper to read in full before
+committing.
+
+## Decisions recorded
+
+| Decision | Against | Why |
+|---|---|---|
+| Product scope = proteins | Any product in biotechnology | Stated by the project owner; cuts 15 of 37 capabilities |
+| Keep requirement 1 (compartments) | Dropping it | Conflict 2 (disulfide redox) is a protein conflict and survives |
+| Demote requirements 3 and 4 | Keeping them as requirements | Both were consequences of 37 capabilities, not of 5 |
+| Build on pcSecYeast | Training a new sequence predictor | Leg 1 is plateaued at ~0.80 AUC on label noise; leg 2 outputs the right variable |
+| Loop must be iterative | Open-loop prediction | The Pichia scFv result says lookalike proteins diverge |
+
+## Not done
+
+- Earlier documents **not revised** — the conflict map, budget, regulatory and
+  candidate files still argue from 37 capabilities and now overstate
+  requirements 3 and 4. Left as the record of the reasoning.
+- **pcSecYeast not obtained or run.** Everything about it is from its abstract.
+- **The Pichia negative result not read in full**, despite being the most
+  consequential finding.
+- The 17-native / 5-engineered split is **judgement, not measurement**.
+- **No metabolomic data source** for the leg the idea explicitly names.
+- No capability scored individually against the 22. All quotes from abstracts.
 
 ---
 
