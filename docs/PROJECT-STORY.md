@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-23 - It is a tool, and its data layer already exists** (below)
 1. **2026-10-23 - Idea sharpened: proteins, and a data-driven design layer** (below)
 1. **2026-10-21 — A candidate named: the rules choose yeast** (below)
 2. **2026-10-20 — Control solved, and a number keeps appearing**
@@ -13,6 +14,107 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-23 — It is a tool, and the data layer it needs already exists
+
+Record: [`protocol/tool-spec-v1.md`](../protocol/tool-spec-v1.md).
+
+**The deliverable is settled: software.** The idea was restated as *"we will
+build a **tool** of universal chassis… all the things that are necessary when
+someone in the future has built this in lab."*
+
+**The chassis is the tool's output, not our build.** A future lab builds it. That
+removes the single largest practical obstacle this project had — **there is no
+wet-lab step on our side.**
+
+## The find that matters
+
+pcSecYeast ships a spreadsheet called the **Protein Specific Information Matrix
+(PSIM)**, holding for every yeast protein:
+
+> *"whether the protein is processed by secretory pathway, the existence of the
+> signal peptide, **number of disulfide bond sites, N-glycosylation sites,
+> O-glycosylation sites, transmembrane domains, GPI sites**, protein
+> localization, protein amino acid sequence and signal peptide sequence"*
+
+**That is this project's capability set, applied one protein at a time, already
+specified and already populated, under GPL-3.0.** Module 1 of the tool does not
+need inventing. It needs reading.
+
+## And the models have moved since 2022
+
+`pcSecYeastSpecies` (updated **December 2025**) extends pcSecYeast to
+*Komagataella phaffii* and *Kluyveromyces marxianus*, with
+*"**proteome allocation constraints**, temperature-dependent enzyme kinetics, and
+**humanized glycosylation modules**"*.
+
+Two of those phrases land directly on this project: **proteome allocation** is
+the constraint `proteome-budget-v1.md` was built on, and **humanised
+glycosylation** is capability **B4**, one of our five engineering targets.
+*K. phaffii* was our named best secretor. **Cross-species chassis comparison is
+already modelled** — we would not build it from nothing.
+
+## The tool, in six modules
+
+| Module | Status |
+|---|---|
+| 1. Requirement extraction — what this protein needs | **Schema exists and is populated** |
+| 2. Capability matching — which switches | Exists as our documents, not code |
+| 3. Bottleneck prediction — where it fails | **Model exists, needs MATLAB** |
+| 4. Circuit design — how switches are wired | Not started |
+| 5. Build specification — what a lab receives | Not started |
+| 6. Iteration from results | Not started — **this is the published gap** |
+
+**Modules 1 and 2 can be built now with no new dependencies.**
+
+## The blocker
+
+**Both models require MATLAB** — *"MATLAB (R2020b or later), COBRA Toolbox,
+RAVEN Toolbox, solver SoPlex."* MATLAB is commercial. Three routes: a university
+site licence; consuming the published simulation outputs as a lookup instead of
+re-running; or re-implementing in Python with COBRApy, which is a research
+project in itself and should not be attempted first.
+
+**Second warning sign:** pcSecYeast was **last updated 2021-07-20** and has **37
+commits, 7 stars, 1 fork**. That is a paper's companion code, not maintained
+software, and it may not run without repair. `pcSecYeastSpecies` is four years
+newer and is the better entry point.
+
+## What is genuinely new here
+
+The modelling science exists. **The tool does not.** What exists is MATLAB
+research code that regenerates two papers' figures, run by its authors. No
+software takes an arbitrary target protein and returns a chassis build
+specification.
+
+**That is a weaker scientific claim than "we found a new architecture" and a much
+stronger practical one** — and it needs no laboratory, which is the whole point.
+
+## Decisions recorded
+
+| Decision | Against | Why |
+|---|---|---|
+| Deliverable is software, chassis is its output | Building or specifying an organism to make ourselves | Stated by the project owner; removes the wet-lab dependency entirely |
+| Reuse the PSIM schema for module 1 | Defining our own feature set | Already specified, already populated, GPL-3.0, and equivalent to our capability set |
+| Enter via `pcSecYeastSpecies`, not pcSecYeast | Starting from the 2022 original | Four years newer, covers three species, includes humanised glycosylation |
+| Build modules 1 and 2 first | Starting at module 3 | They are the only modules with no blocking dependency |
+| Tool must emit uncertainty and tests | Emitting a single confident answer | The Pichia scFv result shows lookalike proteins diverge under identical engineering |
+
+## Not done
+
+- **No code written for any module.** This is a specification. Nothing in the
+  repository executes any part of the tool.
+- **Neither model downloaded or run.** All of it is from README files and
+  abstracts. Whether they run is unverified.
+- **MATLAB availability unresolved**, and it gates module 3.
+- **The PSIM spreadsheet has not been opened** — its contents are described from
+  the README only.
+- **No accuracy claim is possible.** Module 3 inherits pcSecYeast's error, which
+  we have not measured.
+- **The repository is still called HostMatch**, a name from a rejected framing.
+- Quotes are from README files and abstracts, not full papers.
 
 ---
 
