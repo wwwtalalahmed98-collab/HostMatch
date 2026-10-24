@@ -107,6 +107,15 @@ simulation module.
 
 ---
 
+## License
+
+MIT — see [LICENSE](LICENSE). The two external models this project references
+are licensed separately and are not redistributed here; pcSecYeast is GPL-3.0,
+so copying its code into this repository would change what this repository can
+be licensed under.
+
+---
+
 ## How this project is written up
 
 Every claim carries the quote behind it. Every document ends with a section
