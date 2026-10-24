@@ -161,7 +161,7 @@ close to precise.**
 
 **Replaces:** capabilities D4 and D5, precursor and sugar-nucleotide supply,
 currently booleans.
-**Blocked by:** MATLAB.
+**No longer blocked.** See the correction at the end of this document.
 
 ---
 
@@ -174,7 +174,7 @@ enzymatic steps with turnover numbers and proteome costs.
 carries `cost_status: not measured`, which is why the budget constraint cannot
 be checked against a real configuration. **This layer is where those costs come
 from.**
-**Blocked by:** MATLAB.
+**No longer blocked.** See the correction at the end of this document.
 
 ---
 
@@ -199,13 +199,14 @@ variation at all.
 | 3. Resource competition | High — derives the twelve | Yeast parameters | Partly |
 | 1a. Transcription thermodynamics | High | TF binding energies | Partly, for known TFs |
 | 1c. Elongation / TASEP | Medium | tRNA abundances for yeast | Yes |
-| 4. Enzyme-constrained metabolism | High | **MATLAB** | No |
-| 5. Secretory costs | **Highest for the chassis** | **MATLAB** | No |
+| 4. Enzyme-constrained metabolism | High | ~~MATLAB~~ nothing | **Yes** |
+| 5. Secretory costs | **Highest for the chassis** | ~~MATLAB~~ nothing | **Yes** |
 | 1b. Yeast translation initiation | Medium | **No model of standing exists** | No |
 | 6. Noise | Lower for a first design | Parameters | Yes, structurally |
 
-**Two of the three highest-value layers are behind MATLAB.** That is now the
-central obstacle to this project, not an inconvenience.
+**This was wrong when first written.** It said two of the three highest-value
+layers were behind MATLAB and called that the central obstacle. The correction
+below replaced that conclusion within the same day.
 
 ---
 
@@ -237,8 +238,64 @@ is worse than the rule matcher, because it looks authoritative.
 
 ## What is done and what is not
 
+---
+
+## Correction: MATLAB was never the obstacle
+
+**Written hours after the above, and it overturns the document's own
+conclusion.**
+
+Both pcSecYeast repositories state they require MATLAB, the COBRA Toolbox, the
+RAVEN Toolbox and the SoPlex solver. This document took that at face value and
+concluded MATLAB access was the central obstacle to the project.
+
+**MATLAB is required to BUILD those models. It is not required to USE them.**
+
+The `pcSecYeastSpecies` repository commits the **built models** as `.mat` files
+under an **MIT licence**: `pcSecYeast.mat`, `pcSecPichia.mat`, `pcSecKmarx.mat`.
+A `.mat` file is a container, not a MATLAB program. `scipy.io` reads it, and the
+linear program inside is solved by **HiGHS, which ships with scipy**.
+
+Verified, in `scripts/pcsec.py`:
+
+| | |
+|---|---|
+| Model size | **25,776 metabolites x 37,688 reactions**, 1,156 genes |
+| Loaded with | `scipy.io.loadmat` — standard COBRA fields all present |
+| Solved with | **HiGHS, bundled with scipy. No MATLAB, no SoPlex** |
+| Result | Optimal in **6 seconds**, biomass reaction `r_2111` at 0.1418 |
+| File size | **1.6 MB** |
+
+And the machinery the chassis modules need costs for is all in it:
+
+| Probe | Reactions |
+|---|---:|
+| folding | **6,646** |
+| degradation | 3,460 |
+| protein | 1,295 |
+| Golgi | 908 |
+| **glycosylation** | **805** |
+| translocation | 361 |
+| mannosylation | 133 |
+| **disulfide** | **63** |
+| dolichol | 15 |
+
+**Layers 4 and 5 are unblocked.** The thing this project called its central
+obstacle was an assumption nobody had tested, taken from a README.
+
+**What this does not establish:** it solves the model *as shipped*. The authors'
+published results set media, heterologous protein and enzyme constraints through
+their own MATLAB scripts, and **that logic has not been reimplemented**. No
+module cost has been extracted yet. The objective value above has not been
+checked against any published number, so it is a solve, not a validation.
+
+---
+
+## What is done and what is not
+
 **Done:** Layer 2, first pass, in `scripts/growth_coupling.py`. It runs, and it
-corrected the budget conclusion.
+corrected the budget conclusion. And `scripts/pcsec.py`, which loads and solves
+the secretory model without MATLAB.
 
 **Not done:** every other layer. No parameters have been collected for any of
 them. The chassis object still carries no measured module cost. The simulator

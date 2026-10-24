@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-24 - MATLAB was never the obstacle** (below)
 1. **2026-10-24 - Physics added, and it overturned a conclusion** (below)
 1. **2026-10-24 - The whole project in plain language** (below)
 1. **2026-10-24 - The chassis becomes an object, and the first code runs** (below)
@@ -17,6 +18,95 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-24 — MATLAB was never the obstacle
+
+Record: [`scripts/pcsec.py`](../scripts/pcsec.py), and the correction appended to
+[`protocol/theory-stack-v1.md`](../protocol/theory-stack-v1.md).
+Run it with `python -I scripts/pcsec.py`.
+
+**Hours earlier this project recorded MATLAB access as its central obstacle.
+That was wrong, and testing the assumption took one afternoon.**
+
+## The assumption
+
+Both pcSecYeast repositories state in their READMEs that they require MATLAB
+R2020b, the COBRA Toolbox, the RAVEN Toolbox and the SoPlex solver. This project
+read that, repeated it across three documents, and concluded that two of the
+three highest-value theory layers were unreachable.
+
+**Nobody had opened the repository to check what was actually in it.**
+
+## The fact
+
+**MATLAB is required to BUILD those models. It is not required to USE them.**
+
+`pcSecYeastSpecies` commits the **built models** as `.mat` files under an **MIT
+licence** — `pcSecYeast.mat`, `pcSecPichia.mat`, `pcSecKmarx.mat`, plus
+variants. A `.mat` file is a container, not a program. `scipy.io` reads it, and
+the linear program inside is solved by **HiGHS, which ships with scipy**.
+
+| | |
+|---|---|
+| Model | **25,776 metabolites x 37,688 reactions**, 1,156 genes |
+| Loaded with | `scipy.io.loadmat` — every standard COBRA field present |
+| Solved with | **HiGHS, bundled with scipy. No MATLAB, no SoPlex** |
+| Result | **Optimal in 6 seconds**, biomass reaction `r_2111` at 0.1418 |
+| Download | **1.6 MB** |
+
+## And the machinery is all there
+
+The reactions our five engineered modules need costs for:
+
+| Probe | Reactions in the model |
+|---|---:|
+| folding | **6,646** |
+| degradation | 3,460 |
+| protein | 1,295 |
+| Golgi | 908 |
+| **glycosylation** | **805** |
+| translocation | 361 |
+| mannosylation | 133 |
+| **disulfide** | **63** |
+
+`chassis-v1.json` records `cost_status: not measured` for every engineered
+module, and that gap is why the proteome budget constraint cannot be checked
+against a real configuration. **The source of those costs is now open.**
+
+## Two conclusions overturned in one day
+
+| Conclusion | Lifetime | What killed it |
+|---|---|---|
+| The 40% ceiling is a budget you may spend up to | weeks | growth-law coupling: the optimum is 20%, and 40% is zero yield |
+| MATLAB access is the central obstacle | hours | the models ship built, and scipy solves them |
+
+Both were load-bearing. Both were stated confidently. **Neither survived being
+checked.**
+
+## Decisions recorded
+
+| Decision | Against | Why |
+|---|---|---|
+| Consume the built models | Getting a MATLAB licence; porting to Octave; reimplementing in Python | The models are already built, MIT-licensed, and 1.6 MB. None of the alternatives were needed |
+| Download rather than commit the models | Vendoring them into this repository | They are third-party; the script fetches them, so there is no redistribution question and no stale copy |
+| Record the error prominently | Quietly editing the blocker away | Three documents repeated an unchecked README claim; the correction is more useful than the tidy version |
+
+## Not done
+
+- **This solves the model as shipped.** The authors' published results set media,
+  heterologous protein and enzyme constraints through their MATLAB scripts, and
+  **that logic has not been reimplemented.** Solving the model is not the same
+  as using it the way the paper does.
+- **No module cost extracted yet.** The source is open; nothing has been taken
+  from it.
+- **The objective value is unvalidated.** 0.1418 has not been checked against any
+  published number. It is a solve, not a validation.
+- **Octave was investigated and is not a route** — the COBRA Toolbox has an open
+  issue where Octave's native GLPK interface "is detected as unavailable". It
+  did not matter in the end.
+- The chassis object and the simulator still show the uncorrected 40% ceiling.
 
 ---
 

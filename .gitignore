@@ -26,3 +26,6 @@ Thumbs.db
 
 # agent worktrees
 .claude/worktrees/
+
+# downloaded third-party models, fetched by scripts/pcsec.py
+data/models/
