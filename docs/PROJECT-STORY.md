@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-24 - The whole project in plain language** (below)
 1. **2026-10-24 - The chassis becomes an object, and the first code runs** (below)
 1. **2026-10-23 - It is a tool, and its data layer already exists** (below)
 1. **2026-10-23 - Idea sharpened: proteins, and a data-driven design layer** (below)
@@ -15,6 +16,186 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-24 — The whole project in plain language
+
+Not new work. A plain-English account of everything so far, for rereading cold.
+
+## 1. Where we are
+
+**We have working software that reads a protein and tells you what a yeast cell
+would need in order to make it — and this week it was tested against real data
+for the first time.**
+
+## 2. What this project is for
+
+You want **one organism that can manufacture any protein** — insulin, a vaccine
+antigen, an industrial enzyme — instead of a different custom-built organism for
+every product, which is how the field works today.
+
+You are not building that organism. **You are building the tool that specifies
+it**, so that a laboratory in the future can read the specification and build it.
+Winning looks like: someone types in a protein, and gets back a buildable design
+with honest uncertainty attached.
+
+## 3. Why this step
+
+Until this week the software had never been checked against anything. It
+produced confident-looking output that nobody had tested. **If we had carried on
+adding features, we would have been stacking work on top of something that might
+simply be wrong.** Testing it now was the difference between a tool and a
+demonstration.
+
+## 4. What we actually did
+
+Over several weeks, in order:
+
+1. **Turned "makes anything" into a checklist.** A slogan cannot be tested, so we
+   wrote down **37 abilities** a cell would need in order to make any product —
+   from folding proteins correctly to surviving the process.
+2. **Looked for abilities that cannot coexist.** Several genuinely conflict. Some
+   chemistry needs oxygen; other chemistry is destroyed by it.
+3. **Checked whether one cell could afford them all.** A cell has a fixed protein
+   budget. Doing all 37 at once does not fit. Doing them **one product at a time**
+   does.
+4. **Checked whether we could switch them on and off.** Only just — using
+   CRISPR-based switches rather than conventional ones.
+5. **Picked an organism.** Baker's yeast (*Saccharomyces cerevisiae*). Notably,
+   the rules **threw out** every bacterium and every stripped-down "minimal cell",
+   which is what most of the field uses.
+6. **You narrowed it to proteins.** 37 abilities became **22**. Yeast already has
+   **17** of them, leaving **5** to engineer.
+7. **You clarified the deliverable: a tool, and the tool *is* the chassis.** So we
+   wrote the organism down as a data file that software can read.
+8. **Built the code** that reads a protein and resolves it against that file.
+9. **Built a simulator** you can click through.
+10. **Tested it** against curated biological databases.
+
+## 5. How it works
+
+**Think of a kitchen fitted out to cook any dish.**
+
+- **The chassis** is the kitchen — one kitchen, meant to handle any recipe.
+- **The 22 capabilities** are the equipment: oven, fridge, blender, scales.
+- **The protein** is the recipe you hand it.
+- **The resolver** is the step where you read the recipe and list the equipment it
+  needs. *This is the part that now works and has been tested.*
+- **Native vs engineered**: yeast already owns 17 pieces of equipment. **5 would
+  have to be installed.**
+- **The proteome budget** is the kitchen's limited counter space and power supply.
+  You cannot run everything at once.
+- **The conflicts** are the pieces that cannot share a cupboard — a freezer and a
+  furnace.
+
+And the limit, in the same terms: **we can read a recipe and tell you it needs an
+oven. We cannot yet tell you whether the dish will taste good.** Predicting
+whether a protein would actually be produced well needs a simulation we cannot
+run yet.
+
+```mermaid
+flowchart TD
+    A[A protein you want to make] -->|its sequence| B[Read what this protein needs]
+    B -->|needs sugars, staples, a way out| C[Compare against the chassis]
+    D[(The chassis written down<br/>22 abilities, 17 yeast has, 5 to add)] --> C
+    C -->|"17 already there, 5 to install"| E[List of what must be engineered]
+    E -.->|blocked: needs MATLAB| F[Would it actually work?]
+    F -.->|not built| G[Instructions a lab could follow]
+    G -.->|results correct the design| C
+    style C fill:#2563eb,stroke:#1e40af,color:#ffffff
+    style E fill:#2563eb,stroke:#1e40af,color:#ffffff
+```
+
+*Solid arrows work today. Dotted arrows are not built. The blue boxes are where
+we are now: we can say what a protein needs and what the yeast lacks. We cannot
+yet say whether it would work.*
+
+## 6. What you have now
+
+**Working, tested:**
+
+- [`chassis/chassis-v1.json`](../chassis/chassis-v1.json) — the kitchen, written
+  down. Open it and you see 22 abilities, which yeast has and which it lacks, the
+  5 things to install, and an explicit list of what it cannot tell you.
+- [`scripts/chassis_resolve.py`](../scripts/chassis_resolve.py) — hand it a
+  protein, it prints what that protein needs.
+- [`scripts/validate_features.py`](../scripts/validate_features.py) — the test.
+- [`reports/02-feature-validation.md`](../reports/02-feature-validation.md) — the
+  test results, including the two bugs found in the test itself.
+- `sim/chassis-sim.html` — the clickable simulator, published online.
+
+**Written but not built:** everything in `protocol/` is reasoning, not code. The
+step that predicts whether a protein would actually be made is **not built**.
+
+## 7. The test result, honestly
+
+Checked against **24 proteins** with curated annotations.
+
+| | Score |
+|---|---|
+| Glycosylation decision, **secreted proteins** | **16 of 16** |
+| Disulfide decision, secreted proteins | 15 of 16 |
+| Two rougher estimates (signal peptide, membrane) | 88% each |
+
+**It got the main decision right every time inside the job it was built for.**
+
+**Two real faults found.** One count is described as a maximum but isn't — three
+proteins exceed it, because a protein can bond to a *neighbouring* molecule in a
+way our counting cannot see. And the tool switches on "needs disulfide bonds" for
+proteins that merely contain the right atoms without using them.
+
+**I also found two faults in my own test before finding any in the tool.** The
+first version confused one chemical process for another and scored the tool at
+54%. After fixing my test, the real score was 96%. **Both corrections made the
+tool look better, which is exactly why they are written down.**
+
+## 8. Decisions made, and why
+
+| Chose | Chose against | Why |
+|---|---|---|
+| Proteins only | Any biotech product | Your call. Cut 37 abilities to 22 and made the problem tractable |
+| A tool, not an organism | Designing an organism to build | Your call. Removes the need for a laboratory entirely |
+| The chassis as a data file | Code that returns answers | Others can read, argue with and fork the design itself |
+| Baker's yeast | Bacteria, minimal cells | Most spare capacity measured anywhere; the rules reject the alternatives |
+| Test perception before judgement | Building more features | The code had never met real data |
+| Report the defects, don't patch them | Quietly fixing them | Fixing changes what the chassis claims; that deserves its own pass |
+
+## 9. Jargon decoder
+
+- **Chassis** — the host cell everything else is built into. The kitchen.
+- **Capability** — one ability the cell needs. One appliance.
+- **Resolver** — the code that reads a protein and lists what it needs.
+- **Proteome budget** — the cell's total protein capacity. Counter space.
+- **Glycosylation** — sugar chains attached to a protein. Many human drugs do not
+  work without them, and yeast attaches the wrong kind.
+- **Disulfide bond** — a chemical staple holding a protein's shape.
+- **Secreted** — pushed out of the cell, so you collect it from the liquid
+  instead of breaking cells open.
+- **UniProt** — the standard public database of protein facts. Our test's answer key.
+- **Heuristic** — a rough rule of thumb, not a trained predictor. Ours are 88%.
+- **pcSecYeast** — someone else's published yeast simulation. Needs MATLAB, which
+  we do not have. This is the blocker on predicting success.
+
+## 10. What is next, and what could go wrong
+
+**Next:** fix the two faults, then rerun the test to prove they are gone. The
+test now exists to check that, which it did not a day ago.
+
+**The honest risks:**
+
+- **We can describe, not predict.** Without the MATLAB simulation we cannot say
+  whether any design would work. That is the biggest gap.
+- **The chassis has never been built.** Every claim is about a hypothetical
+  organism.
+- **24 well-studied proteins is the easy case.** Obscure proteins are annotated
+  worse and would likely score lower.
+- **The important half is untested.** We tested whether the tool *reads* a protein
+  correctly. We have not tested whether its *advice* is correct — that needs data
+  on real yeast experiments, which this project does not have.
+- **A published paper argues the whole premise has a ceiling:** two near-identical
+  antibody fragments behaved completely differently under identical engineering.
+  Sequence alone may not be enough, no matter how good the software gets.
 
 ---
 
