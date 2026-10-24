@@ -1,0 +1,25 @@
+accession	name	category	length	uniprot_nglyc	our_sequons	nglyc_found	nglyc_missed	sequons_not_glycosylated	uniprot_ss_bonds	our_ss_pairs	uniprot_signal	our_signal	signal_match	uniprot_tm	our_tm	tm_match	uniprot_oglyc
+P01588	Erythropoietin	secreted	193	3	3	3	0	0	2	2	1	1	1	0	0	1	1
+P01308	Insulin	secreted	110	0	0	0	0	0	3	3	1	1	1	0	0	1	0
+P01241	Somatotropin	secreted	217	0	0	0	0	0	2	2	1	1	1	0	0	1	0
+P02768	Serum albumin	secreted	609	0	0	0	0	0	17	17	1	1	1	0	0	1	0
+P02787	Serotransferrin	secreted	698	3	2	2	1	0	19	20	1	1	1	0	0	1	1
+P01009	Alpha-1-antitrypsin	secreted	418	3	3	3	0	0	0	1	1	1	1	0	1	0	0
+P00750	Tissue plasminogen activator	secreted	562	3	3	3	0	0	17	19	1	1	1	0	1	0	1
+P00734	Prothrombin	secreted	622	3	4	3	0	1	12	13	1	1	1	0	0	1	0
+P01024	Complement C3	secreted	1663	3	3	3	0	0	14	13	1	1	1	0	1	0	0
+P04275	von Willebrand factor	secreted	2813	16	16	15	1	1	34	117	1	1	1	0	0	1	10
+P00738	Haptoglobin	secreted	406	4	4	4	0	0	7	6	1	1	1	0	0	1	0
+P05019	IGF-1	secreted	195	0	0	0	0	0	3	5	1	0	0	0	0	1	0
+P01344	IGF-2	secreted	180	0	0	0	0	0	3	4	1	1	1	0	0	1	3
+P61626	Lysozyme C, human	secreted	148	0	0	0	0	0	4	4	1	1	1	0	0	1	0
+P00698	Lysozyme C, chicken	secreted	147	0	0	0	0	0	4	4	1	1	1	0	0	1	0
+P01857	Ig gamma-1 chain C region	secreted	399	1	1	1	0	0	8	5	0	1	0	1	1	1	0
+P68871	Hemoglobin beta	cytosolic	147	0	0	0	0	0	0	1	0	0	1	0	0	1	0
+P69905	Hemoglobin alpha	cytosolic	142	0	0	0	0	0	0	0	0	0	1	0	0	1	0
+P04406	GAPDH	cytosolic	335	0	2	0	0	2	0	1	0	0	1	0	0	1	0
+P60709	Beta-actin	cytosolic	375	0	1	0	0	1	0	3	0	0	1	0	0	1	0
+P00558	Phosphoglycerate kinase 1	cytosolic	417	0	0	0	0	0	0	3	0	0	1	0	0	1	0
+P07550	Beta-2 adrenergic receptor	membrane	413	2	6	2	0	4	2	6	0	0	1	7	6	1	0
+P11166	Glucose transporter 1	membrane	492	1	2	1	0	1	0	3	0	1	0	12	9	1	0
+P08183	Multidrug resistance protein 1	membrane	1280	3	10	3	0	7	0	3	0	0	1	12	10	1	0
