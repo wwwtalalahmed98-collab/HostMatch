@@ -1,0 +1,508 @@
+<title>Chassis Bench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bench console - selector strip, cell cross-section beside a live readout, then capability grid, modules, budget sweep */
+:root{
+  --bg:#EBF0EE; --surface:#FFFFFF; --surface-2:#F4F7F6;
+  --ink:#141F1D; --ink-2:#4B5B58; --ink-3:#73847F;
+  --line:#CCD8D4; --line-2:#B2C2BD;
+  --native:#136F58; --native-bg:#DCEDE7;
+  --eng:#9C5B0C; --eng-bg:#F7EADA;
+  --unknown:#8A4536; --unknown-bg:#F6E5E0;
+  --accent:#0C5765;
+  --font-display:'Archivo',system-ui,sans-serif;
+  --font-body:'Source Serif 4',Georgia,serif;
+  --font-data:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1211; --surface:#131D1B; --surface-2:#182422;
+  --ink:#E7EEEB; --ink-2:#9DB0AB; --ink-3:#7A8C87;
+  --line:#26352F; --line-2:#364943;
+  --native:#4FC39F; --native-bg:#102A23;
+  --eng:#E3A54F; --eng-bg:#2C2113;
+  --unknown:#DC8871; --unknown-bg:#2E1A15;
+  --accent:#63C8D8;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0B1211; --surface:#131D1B; --surface-2:#182422;
+  --ink:#E7EEEB; --ink-2:#9DB0AB; --ink-3:#7A8C87;
+  --line:#26352F; --line-2:#364943;
+  --native:#4FC39F; --native-bg:#102A23;
+  --eng:#E3A54F; --eng-bg:#2C2113;
+  --unknown:#DC8871; --unknown-bg:#2E1A15;
+  --accent:#63C8D8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,4.4vw,40px);font-weight:700;letter-spacing:-.022em;line-height:1.08}
+h2{font-size:15px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+h3{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.sub{color:var(--ink-2);max-width:62ch;margin-top:10px;font-size:16.5px}
+.mono{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+header{border-bottom:1px solid var(--line);padding-bottom:22px}
+.eyebrow{font-family:var(--font-data);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+section{margin-top:34px}
+.sechead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sechead p{margin:0;color:var(--ink-3);font-size:14px}
+
+/* selector */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+button.chip{font-family:var(--font-display);font-size:13.5px;font-weight:500;padding:9px 14px;border-radius:999px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer;transition:.15s}
+button.chip:hover{border-color:var(--accent)}
+button.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+button.chip small{display:block;font-family:var(--font-data);font-size:10.5px;opacity:.72;font-weight:400;letter-spacing:.02em}
+.paste{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+textarea{flex:1 1 320px;min-width:0;min-height:62px;font-family:var(--font-data);font-size:12px;padding:10px;
+  border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);color:var(--ink);resize:vertical}
+.btn{font-family:var(--font-display);font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--accent);background:var(--accent);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--accent)}
+label.opt{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink-2);font-family:var(--font-display)}
+select{font-family:var(--font-data);font-size:12.5px;padding:8px 10px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);color:var(--ink)}
+
+/* console */
+.console{display:grid;grid-template-columns:1.25fr .95fr;gap:18px;align-items:start}
+@media (max-width:840px){.console{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.panel>h3{margin-bottom:4px}
+.panel .note{color:var(--ink-3);font-size:13px;margin:0 0 12px}
+svg.cell{width:100%;height:auto;display:block}
+.cell text{font-family:var(--font-data)}
+.mark{opacity:0;transition:opacity .45s ease}
+.mark.on{opacity:1}
+.cargo{transition:transform .65s cubic-bezier(.45,.05,.3,1)}
+@media (prefers-reduced-motion:reduce){.cargo{transition:none}.mark{transition:none}}
+
+/* readout */
+dl.feat{display:grid;grid-template-columns:1fr auto;gap:2px 14px;margin:0;font-size:13.5px}
+dl.feat dt{color:var(--ink-2);font-family:var(--font-display);min-width:0}
+dl.feat dd{margin:0;font-family:var(--font-data);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+dl.feat .heur dd,dl.feat .heur dt{color:var(--ink-3)}
+.tag{font-family:var(--font-data);font-size:9.5px;letter-spacing:.08em;padding:1px 5px;border-radius:4px;
+  background:var(--unknown-bg);color:var(--unknown);vertical-align:1px;margin-left:6px}
+#log{font-family:var(--font-data);font-size:11.5px;line-height:1.75;color:var(--ink-2);margin:12px 0 0;
+  border-top:1px dashed var(--line-2);padding-top:10px;max-height:168px;overflow-y:auto}
+#log div{opacity:0;animation:fade .3s forwards}
+@keyframes fade{to{opacity:1}}
+#log b{color:var(--native);font-weight:500}
+#log i{color:var(--eng);font-style:normal}
+
+/* capability grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:8px}
+.cap{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--surface-2);min-width:0}
+.cap .cid{font-family:var(--font-data);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3)}
+.cap .cname{font-family:var(--font-display);font-size:13px;font-weight:500;line-height:1.35;margin-top:2px}
+.cap .why{font-family:var(--font-data);font-size:10.5px;color:var(--ink-3);margin-top:5px;line-height:1.5}
+.cap.off{opacity:.42}
+.cap.nat{background:var(--native-bg);border-color:var(--native)}
+.cap.nat .cid{color:var(--native)}
+.cap.eng{background:var(--eng-bg);border-color:var(--eng)}
+.cap.eng .cid{color:var(--eng)}
+.cap.unk{background:var(--unknown-bg);border-color:var(--unknown);border-style:dashed}
+.cap.unk .cid{color:var(--unknown)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--font-data);font-size:11.5px;color:var(--ink-2);margin-bottom:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;border:1px solid}
+.sw.n{background:var(--native-bg);border-color:var(--native)}
+.sw.e{background:var(--eng-bg);border-color:var(--eng)}
+.sw.u{background:var(--unknown-bg);border-color:var(--unknown);border-style:dashed}
+.sw.o{background:var(--surface-2);border-color:var(--line)}
+
+/* modules */
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:12px}
+.mod{border:1px solid var(--eng);border-left:4px solid var(--eng);border-radius:0 10px 10px 0;background:var(--surface);padding:14px;min-width:0}
+.mod .mid{font-family:var(--font-data);font-size:11px;color:var(--eng);letter-spacing:.06em}
+.mod h3{margin:3px 0 7px}
+.mod p{margin:0 0 9px;font-size:14px;color:var(--ink-2)}
+.mod .parts{font-family:var(--font-data);font-size:11px;color:var(--ink-3);line-height:1.65}
+.mod .cost{font-family:var(--font-data);font-size:11px;color:var(--unknown);margin-top:9px;padding-top:8px;border-top:1px dashed var(--line-2)}
+.conf{font-family:var(--font-data);font-size:10px;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:4px;border:1px solid currentColor;color:var(--ink-3)}
+
+/* budget */
+.bar{height:38px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);position:relative;overflow:hidden;margin:14px 0 8px}
+.fill{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(45deg,var(--eng) 0 6px,transparent 6px 12px),var(--eng-bg);
+  border-right:2px solid var(--eng);transition:width .3s}
+.ceil{position:absolute;top:0;bottom:0;width:2px;background:var(--native)}
+.ceil b{position:absolute;top:3px;left:6px;font-family:var(--font-data);font-size:10px;color:var(--native);white-space:nowrap;font-weight:400}
+.scale{display:flex;justify-content:space-between;font-family:var(--font-data);font-size:10.5px;color:var(--ink-3)}
+input[type=range]{width:100%;accent-color:var(--eng)}
+.readnum{font-family:var(--font-data);font-size:13px;color:var(--ink-2)}
+.readnum b{color:var(--ink);font-weight:500}
+
+/* limits */
+.limits{background:var(--unknown-bg);border:1px solid var(--unknown);border-radius:12px;padding:18px}
+.limits h2{color:var(--unknown)}
+.limits ul{margin:12px 0 0;padding-left:20px;font-size:14.5px}
+.limits li{margin-bottom:7px}
+.limits li b{font-weight:600}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--font-data);font-size:11.5px;color:var(--ink-3);line-height:1.8}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">UCP-1 &middot; Saccharomyces cerevisiae &middot; in silico only</div>
+  <h1>Chassis Bench</h1>
+  <p class="sub">Pick a protein. The chassis works out what that protein needs, which parts the yeast already has, and which have to be engineered in. Nothing here has been built in a laboratory &mdash; this is a design being simulated, not a measurement.</p>
+</header>
+
+<section>
+  <div class="sechead"><h2>Target protein</h2><p>Reference sequences from the literature. Verify any sequence before ordering DNA.</p></div>
+  <div class="chips" id="chips"></div>
+  <div class="paste">
+    <textarea id="custom" placeholder="Or paste an amino acid sequence (FASTA header optional)"></textarea>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn" id="run">Run sequence</button>
+      <label class="opt"><input type="checkbox" id="secreted" checked> Secreted product</label>
+      <label class="opt">Class
+        <select id="pclass">
+          <option value="therapeutic">therapeutic</option>
+          <option value="enzyme">enzyme</option>
+          <option value="antigen">antigen</option>
+          <option value="other">other</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</section>
+
+<section class="console">
+  <div class="panel">
+    <h3 id="cellTitle">Inside the cell</h3>
+    <p class="note">The product is traced from transcription to the medium. Marks appear in the compartment where each step happens.</p>
+    <svg class="cell" viewBox="0 0 560 330" role="img" aria-labelledby="cellt cedesc">
+      <title id="cellt">Cross-section of the engineered yeast cell</title>
+      <desc id="cedesc">A yeast cell showing nucleus, cytoplasm, endoplasmic reticulum, Golgi and a secretory vesicle. Marks appear for disulfide bonds in the ER, glycans in the ER and Golgi, and secretion out of the cell.</desc>
+
+      <ellipse cx="270" cy="165" rx="246" ry="150" fill="var(--surface-2)" stroke="var(--line-2)" stroke-width="1.5"/>
+      <ellipse cx="270" cy="165" rx="238" ry="142" fill="none" stroke="var(--line)" stroke-width="1"/>
+      <text x="22" y="312" font-size="10.5" fill="var(--ink-3)">cell wall + membrane</text>
+
+      <circle cx="96" cy="150" r="43" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.2"/>
+      <text x="96" y="147" font-size="10.5" fill="var(--accent)" text-anchor="middle">nucleus</text>
+      <text x="96" y="161" font-size="9" fill="var(--ink-3)" text-anchor="middle">A1 A2 A3</text>
+
+      <path d="M166 92 Q214 118 190 152 Q166 186 214 212" fill="none" stroke="var(--native)" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+      <path d="M166 92 Q214 118 190 152 Q166 186 214 212" fill="none" stroke="var(--native)" stroke-width="1.4" stroke-linecap="round"/>
+      <text x="196" y="80" font-size="10.5" fill="var(--native)" text-anchor="middle">ER</text>
+      <g id="mER" class="mark">
+        <text x="150" y="124" font-size="11" fill="var(--native)" text-anchor="end" id="ssLabel">S&ndash;S</text>
+        <text x="150" y="140" font-size="9.5" fill="var(--ink-3)" text-anchor="end" id="ssCount"></text>
+      </g>
+      <g id="mFold" class="mark"><text x="232" y="152" font-size="9.5" fill="var(--native)">chaperones B1</text></g>
+
+      <g stroke="var(--eng)" stroke-width="7" stroke-linecap="round" opacity=".4">
+        <path d="M296 104 h58"/><path d="M290 122 h70"/><path d="M296 140 h58"/>
+      </g>
+      <g stroke="var(--eng)" stroke-width="1.2" stroke-linecap="round" fill="none">
+        <path d="M296 104 h58"/><path d="M290 122 h70"/><path d="M296 140 h58"/>
+      </g>
+      <text x="325" y="92" font-size="10.5" fill="var(--eng)" text-anchor="middle">Golgi</text>
+      <g id="mGlyc" class="mark">
+        <polygon points="378,112 386,107 394,112 394,122 386,127 378,122" fill="var(--eng-bg)" stroke="var(--eng)" stroke-width="1.2"/>
+        <polygon points="396,130 404,125 412,130 412,140 404,145 396,140" fill="var(--eng-bg)" stroke="var(--eng)" stroke-width="1.2"/>
+        <text x="380" y="160" font-size="9.5" fill="var(--eng)" id="glycLabel"></text>
+      </g>
+
+      <circle cx="430" cy="196" r="20" fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <text x="430" y="228" font-size="10.5" fill="var(--ink-3)" text-anchor="middle">vesicle</text>
+      <g id="mSec" class="mark">
+        <path d="M454 190 q46 -14 78 -34" fill="none" stroke="var(--eng)" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="476" y="176" font-size="9.5" fill="var(--eng)">E3 secreted</text>
+      </g>
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round"/></marker></defs>
+      <g id="mIntra" class="mark"><text x="430" y="248" font-size="9.5" fill="var(--ink-2)" text-anchor="middle">retained inside</text></g>
+
+      <text x="270" y="276" font-size="10.5" fill="var(--ink-3)" text-anchor="middle">cytoplasm &middot; D4 amino acid pools &middot; G1 growth</text>
+
+      <g id="cargo" class="cargo" transform="translate(96,150)">
+        <circle r="9" fill="var(--accent)"/>
+        <circle r="13" fill="none" stroke="var(--accent)" stroke-width="1" opacity=".45"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <h3>Readout</h3>
+    <p class="note">Computed from the sequence. Two calls are heuristics, not trained predictors.</p>
+    <dl class="feat" id="feat"></dl>
+    <div id="log" aria-live="polite"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Capabilities</h2><p id="capCount"></p></div>
+  <div class="legend">
+    <span><i class="sw n"></i> native to yeast</span>
+    <span><i class="sw e"></i> needs engineering</span>
+    <span><i class="sw u"></i> unknown from sequence</span>
+    <span><i class="sw o"></i> not needed here</span>
+  </div>
+  <div class="grid" id="caps"></div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Modules to build</h2><p id="modCount"></p></div>
+  <div class="mods" id="mods"></div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Proteome budget</h2><p>A sweep, not a prediction. No module's cost has been measured.</p></div>
+  <div class="panel">
+    <label class="opt" for="cost" style="display:block;margin-bottom:6px">Assumed cost per engineered module: <b class="mono" id="costOut">2.0%</b> of cell protein</label>
+    <input type="range" id="cost" min="5" max="100" step="5" value="20">
+    <div class="bar">
+      <div class="fill" id="fill" style="width:0%"></div>
+      <div class="ceil" style="left:40%"><b>40% ceiling</b></div>
+    </div>
+    <div class="scale"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100% of cell protein</span></div>
+    <p class="readnum" id="budgetOut"></p>
+  </div>
+</section>
+
+<section>
+  <div class="limits">
+    <h2>What this cannot tell you</h2>
+    <ul>
+      <li><b>No titre, yield or probability of success.</b> The simulation step that would predict those needs a proteome-constrained metabolic model, which runs in MATLAB and is not wired in.</li>
+      <li><b>The budget bar is a sweep across an assumption.</b> Nobody has measured what any of these modules costs the cell, so the 40% ceiling cannot yet be checked against a real answer.</li>
+      <li><b>The signal peptide and transmembrane calls are hydropathy heuristics.</b> Real answers need SignalP and DeepTMHMM. They are marked in the readout.</li>
+      <li><b>O-glycosylation and other modifications come back unknown, not zero.</b> They cannot be read off a sequence here.</li>
+      <li><b>This chassis does not exist.</b> It is a base organism plus five proposed modules, each carrying published precedent rather than a validated construct.</li>
+      <li><b>No validation against measured outcomes.</b> A published result reports that architecturally similar antibody fragments behave differently under identical engineering, so sequence alone has a ceiling no model removes.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  Capability set, conflicts, proteome arithmetic and organism choice: the protocol documents in this project.<br>
+  Chassis definition: chassis/chassis-v1.json &middot; same resolver logic as scripts/chassis_resolve.py<br>
+  External models referenced but not run: pcSecYeast (Chalmers) and pcSecYeastSpecies (Tsinghua), both MATLAB.
+</footer>
+</div>
+
+<script>
+const KD={A:1.8,R:-4.5,N:-3.5,D:-3.5,C:2.5,Q:-3.5,E:-3.5,G:-0.4,H:-3.2,I:4.5,L:3.8,K:-3.9,M:1.9,F:2.8,P:-1.6,S:-0.8,T:-0.7,W:-0.9,Y:-1.3,V:4.2};
+
+const CAPS=[
+ {id:"A1",name:"Codon usage matched to host",status:"native",always:1},
+ {id:"A2",name:"Promoter works in host",status:"native",always:1},
+ {id:"A3",name:"Translation initiation",status:"native",always:1},
+ {id:"A4",name:"Large coding sequence",status:"eng",mod:"MOD-largecds"},
+ {id:"B1",name:"Folding and chaperones",status:"native",always:1},
+ {id:"B2",name:"Disulfide bond formation",status:"native"},
+ {id:"B3",name:"N-glycosylation present",status:"native"},
+ {id:"B4",name:"Human-like N-glycans",status:"eng",mod:"MOD-glycan"},
+ {id:"B5",name:"O-glycosylation",status:"unknown"},
+ {id:"B6",name:"Other modifications",status:"unknown"},
+ {id:"B7",name:"Protease balance",status:"native",always:1},
+ {id:"D4",name:"Amino acid pools",status:"native",always:1},
+ {id:"D5",name:"Sugar-nucleotide pool",status:"eng",mod:"MOD-sugarnt"},
+ {id:"E3",name:"Secretion capacity",status:"eng",mod:"MOD-secretion"},
+ {id:"F3",name:"Stress response",status:"native",always:1},
+ {id:"F4",name:"Feedstock tolerance",status:"native",always:1},
+ {id:"G1",name:"Growth and biomass",status:"native",always:1},
+ {id:"G2",name:"Burden control",status:"eng",mod:"MOD-burden",always:1},
+ {id:"G3",name:"Genetic stability",status:"native",always:1},
+ {id:"G4",name:"Culture conditions",status:"native",always:1},
+ {id:"G5",name:"Scale-up demonstrated",status:"native",always:1},
+ {id:"G6",name:"Safety and regulatory",status:"native",always:1}
+];
+
+const MODS={
+ "MOD-glycan":{name:"Humanised N-glycans",conf:"medium",goal:"Replace high-mannose yeast glycans with human-like structures, which a therapeutic needs to avoid being immunogenic.",parts:"OCH1 knockout, alpha-1,2-mannosidase, GlcNAc transferase I and II, galactosyltransferase, Golgi localisation signals",cost:"Cost not measured. This is the most expensive module and its burden is unknown."},
+ "MOD-sugarnt":{name:"Sugar-nucleotide supply",conf:"medium",goal:"Feed the humanised glycan pathway with UDP-GlcNAc and UDP-galactose at the rate it consumes them.",parts:"UDP-GlcNAc pathway enzymes, UDP-Gal 4-epimerase, Golgi nucleotide-sugar transporters",cost:"Cost not measured. Only needed alongside the glycan module, so their costs must be summed together."},
+ "MOD-secretion":{name:"Raised secretory flux",conf:"medium",goal:"Push secretion above the cell's native capacity so the product leaves intact instead of jamming the pathway.",parts:"signal peptide selection, ER chaperone overexpression, UPR regulator HAC1, gene dosage tuning",cost:"Cost not measured. Which helpers to overexpress turns out to be protein-specific."},
+ "MOD-largecds":{name:"Large coding sequence",conf:"low",goal:"Carry and express an unusually long coding sequence without truncation or recombination.",parts:"assembly strategy, integration locus choice, repeat-avoiding codon design",cost:"Cost not measured. The cited precedent is a multi-gene cluster, not one large protein."},
+ "MOD-burden":{name:"Burden control",conf:"low",goal:"Keep total heterologous expression inside the proteome budget by switching modules on per product rather than running them always.",parts:"inducible promoter per module, a small set of orthogonal regulators",cost:"Cost not measured. Five independent switches is within routine reach."}
+};
+
+const PROTEINS=[
+ {n:"Human preproinsulin",t:"110 aa · 3 disulfides",cls:"therapeutic",sec:1,
+  s:"MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKTRREAEDLQVGQVELGGGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLYQLENYCN"},
+ {n:"Human erythropoietin",t:"166 aa · glycoprotein",cls:"therapeutic",sec:1,
+  s:"APPRLICDSRVLERYLLEAKEAENITTGCAEHCSLNENITVPDTKVNFYAWKRMEVGQQAVEVWQGLALLSEAVLRGQALLVNSSQPWEPLQLHVDKAVSGLRSLTTLLRALGAQKEAISPPDAASAAPLRTITADTFRKLFRVYSNFLRGKLKLYTGEACRTGDR"},
+ {n:"Human growth hormone",t:"191 aa · no glycans",cls:"therapeutic",sec:1,
+  s:"FPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF"},
+ {n:"Hen egg lysozyme",t:"129 aa · 4 disulfides",cls:"enzyme",sec:1,
+  s:"KVFGRCELAAAMKRHGLDNYRGYSLGNWVCAAKFESNFNTQATNRNTDGSTDYGILQINSRWWCNDGRTPGSRNLCNIPCSALLSSDITASVNCAKKIVSDGNGMNAWVAWRNRCKGTDVQAWIRGCRL"}
+];
+
+const meanKD=s=>{let t=0,n=0;for(const c of s){if(c in KD){t+=KD[c];n++}}return n?t/n:0};
+
+function featuresOf(raw){
+  const seq=raw.toUpperCase().replace(/[^A-Z]/g,"");
+  const n=seq.length, pos=[];
+  for(let i=0;i<n-2;i++) if(seq[i]==="N"&&seq[i+1]!=="P"&&(seq[i+2]==="S"||seq[i+2]==="T")) pos.push(i+1);
+  const cys=(seq.match(/C/g)||[]).length;
+  let sigH=0;
+  for(let i=0;i<=Math.min(22,Math.max(n-9,0));i++) sigH=Math.max(sigH,meanKD(seq.slice(i,i+9)));
+  const sig=n>30&&sigH>1.6;
+  let tm=0,i=sig?25:0;
+  while(i<=n-19){ if(meanKD(seq.slice(i,i+19))>1.6){tm++;i+=19} else i++ }
+  const bad=[...new Set([...seq].filter(c=>!(c in KD)))];
+  return {len:n,cys,pairs:Math.floor(cys/2),sequons:pos.length,pos,sig,sigH,tm,bad};
+}
+
+function resolve(f,cls,sec){
+  const out={};
+  for(const c of CAPS){
+    let why=null;
+    if(c.status==="unknown"){ out[c.id]={state:"unknown",why:"not computable from sequence"}; continue }
+    if(c.always) why="every product needs this";
+    else if(c.id==="B2"&&f.pairs>=1) why=f.cys+" cysteines, up to "+f.pairs+" pairs";
+    else if(c.id==="B3"&&f.sequons>=1) why=f.sequons+" N-X-S/T sequon"+(f.sequons>1?"s":"");
+    else if(c.id==="B4"&&f.sequons>=1&&cls==="therapeutic") why="glycosylated therapeutic";
+    else if(c.id==="A4"&&f.len>1000) why=f.len+" aa is beyond the routine range";
+    else if(c.id==="E3"&&sec) why="product is secreted";
+    out[c.id]=why?{state:c.status,why,mod:c.mod}:{state:"off",why:"not required"};
+  }
+  if(out.B4.state==="eng") out.D5={state:"eng",why:"feeds the glycan module",mod:"MOD-sugarnt"};
+  return out;
+}
+
+let state={f:null,r:null,name:"",cls:"therapeutic",sec:true};
+
+const el=id=>document.getElementById(id);
+
+function renderChips(){
+  const c=el("chips");
+  PROTEINS.forEach((p,i)=>{
+    const b=document.createElement("button");
+    b.className="chip"; b.type="button"; b.setAttribute("aria-pressed","false");
+    b.innerHTML=p.n+"<small>"+p.t+"</small>";
+    b.onclick=()=>{ el("pclass").value=p.cls; el("secreted").checked=!!p.sec; el("custom").value=""; go(p.s,p.n,i) };
+    c.appendChild(b);
+  });
+}
+function markChip(i){ [...el("chips").children].forEach((b,j)=>b.setAttribute("aria-pressed",j===i?"true":"false")) }
+
+function renderFeat(f){
+  el("feat").innerHTML=
+   row("Length",f.len+" aa")+
+   row("Cysteines",f.cys+" ("+f.pairs+" pairs)")+
+   row("N-glyc sequons",f.sequons+(f.pos.length?" @ "+f.pos.slice(0,5).join(", ")+(f.pos.length>5?"…":""):""))+
+   row("Signal peptide",f.sig?"yes":"no",1)+
+   row("TM segments",String(f.tm),1)+
+   row("O-glycosylation","unknown")+
+   row("Other modifications","unknown")+
+   (f.bad.length?row("Non-standard residues",f.bad.join(" ")):"");
+}
+const row=(k,v,h)=>'<div class="'+(h?"heur":"")+'" style="display:contents"><dt>'+k+(h?'<span class="tag">HEURISTIC</span>':'')+'</dt><dd>'+v+'</dd></div>';
+
+function renderCaps(r){
+  const g=el("caps"); g.innerHTML="";
+  let nat=0,eng=0,unk=0;
+  for(const c of CAPS){
+    const s=r[c.id];
+    const d=document.createElement("div");
+    let cls="cap";
+    if(s.state==="native"){cls+=" nat";nat++}
+    else if(s.state==="eng"){cls+=" eng";eng++}
+    else if(s.state==="unknown"){cls+=" unk";unk++}
+    else cls+=" off";
+    d.className=cls;
+    d.innerHTML='<div class="cid">'+c.id+'</div><div class="cname">'+c.name+'</div><div class="why">'+s.why+'</div>';
+    g.appendChild(d);
+  }
+  el("capCount").textContent=nat+" native · "+eng+" need engineering · "+unk+" unknown · "+(CAPS.length-nat-eng-unk)+" not needed, out of 22 in the protein set";
+  return {nat,eng,unk};
+}
+
+function renderMods(r){
+  const ids=[...new Set(Object.values(r).filter(s=>s.state==="eng"&&s.mod).map(s=>s.mod))].sort();
+  const w=el("mods"); w.innerHTML="";
+  for(const id of ids){
+    const m=MODS[id];
+    const d=document.createElement("div"); d.className="mod";
+    d.innerHTML='<div class="mid">'+id+' <span class="conf">'+m.conf+' confidence</span></div><h3>'+m.name+'</h3><p>'+m.goal+'</p>'+
+      '<div class="parts"><b>Parts:</b> '+m.parts+'</div><div class="cost">'+m.cost+'</div>';
+    w.appendChild(d);
+  }
+  el("modCount").textContent=ids.length+" module"+(ids.length===1?"":"s")+" for this product. Every one is a proposal, not a validated construct.";
+  return ids.length;
+}
+
+const WAY=[[96,150,"nucleus"],[190,152,"ER"],[325,122,"Golgi"],[430,196,"vesicle"],[540,152,"medium"]];
+let timer=null;
+function animate(r,f){
+  clearTimeout(timer);
+  const marks=["mER","mFold","mGlyc","mSec","mIntra"];
+  marks.forEach(m=>el(m).classList.remove("on"));
+  el("ssCount").textContent=f.pairs?"up to "+f.pairs+" bonds":"";
+  el("glycLabel").textContent=r.B4.state==="eng"?"B4 humanised":(r.B3.state==="native"?"B3 native glycans":"");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const steps=state.sec?WAY:WAY.slice(0,4);
+  const lg=el("log"); lg.innerHTML="";
+  const say=t=>{const d=document.createElement("div");d.innerHTML=t;lg.appendChild(d);lg.scrollTop=lg.scrollHeight};
+
+  const acts=[
+    ()=>{say("<b>nucleus</b> transcription, A1 A2 A3 native")},
+    ()=>{ if(f.pairs){el("mER").classList.add("on");say("<b>ER</b> "+f.pairs+" disulfide pair"+(f.pairs>1?"s":"")+" formed, B2 native")} else say("<b>ER</b> no cysteine pairs, B2 not needed");
+          el("mFold").classList.add("on");
+          if(r.B3.state==="native") say("<b>ER</b> "+f.sequons+" glycan"+(f.sequons===1?"":"s")+" attached, B3 native") },
+    ()=>{ if(r.B4.state==="eng"){el("mGlyc").classList.add("on");say("<i>Golgi</i> yeast glycans are high-mannose, MOD-glycan required");say("<i>Golgi</i> MOD-sugarnt required to feed it")}
+          else if(r.B3.state==="native"){el("mGlyc").classList.add("on");say("<b>Golgi</b> glycans left as yeast makes them")}
+          else say("<b>Golgi</b> nothing to modify") },
+    ()=>{ if(state.sec){say("<i>vesicle</i> MOD-secretion required, E3 above native capacity")} else {el("mIntra").classList.add("on");say("<b>vesicle</b> product retained, recovery needs cell lysis")} },
+    ()=>{ el("mSec").classList.add("on");say("<i>medium</i> product secreted — titre not predicted, no model wired in") }
+  ];
+
+  let i=0;
+  const step=()=>{
+    const [x,y]=steps[i];
+    el("cargo").setAttribute("transform","translate("+x+","+y+")");
+    acts[i]();
+    i++;
+    if(i<steps.length) timer=setTimeout(step,reduce?0:720);
+  };
+  step();
+}
+
+function budget(){
+  const pct=+el("cost").value/10;
+  el("costOut").textContent=pct.toFixed(1)+"%";
+  const n=state.r?[...new Set(Object.values(state.r).filter(s=>s.state==="eng"&&s.mod).map(s=>s.mod))].length:0;
+  const total=n*pct;
+  el("fill").style.width=Math.min(total,100)+"%";
+  el("budgetOut").innerHTML=n+" module"+(n===1?"":"s")+" × <b>"+pct.toFixed(1)+"%</b> = <b>"+total.toFixed(1)+"%</b> of cell protein. "+
+    (total<=40?"Inside the measured 40% ceiling.":"<b style='color:var(--unknown)'>Over the 40% ceiling — this configuration would not grow.</b>")+
+    " Break-even for "+(n||1)+" module"+(n===1?"":"s")+" is "+(40/(n||1)).toFixed(1)+"% each.";
+}
+
+function go(seq,name,idx){
+  const f=featuresOf(seq);
+  if(!f.len){ el("log").innerHTML="<div>No amino acid residues found in that input.</div>"; return }
+  state.seq=seq; state.idx=idx; state.name=name;
+  state.cls=el("pclass").value; state.sec=el("secreted").checked;
+  const r=resolve(f,state.cls,state.sec);
+  state.f=f; state.r=r;
+  el("cellTitle").textContent=name;
+  markChip(idx===undefined?-1:idx);
+  renderFeat(f); renderCaps(r); renderMods(r); budget(); animate(r,f);
+}
+
+const rerun=()=>{ if(state.seq) go(state.seq,state.name,state.idx) };
+
+renderChips();
+el("run").onclick=()=>{
+  const raw=el("custom").value;
+  const lines=raw.split("\n");
+  const body=lines.filter(l=>!l.startsWith(">")).join("");
+  const hdr=(lines.find(l=>l.startsWith(">"))||"").replace(/^>/,"").trim();
+  if(body.replace(/[^A-Za-z]/g,"").length) go(body,hdr||"Pasted sequence",undefined);
+  else el("log").innerHTML="<div>Paste a sequence first, or pick one above.</div>";
+};
+el("cost").oninput=budget;
+el("pclass").onchange=rerun;
+el("secreted").onchange=rerun;
+go(PROTEINS[1].s,PROTEINS[1].n,1);
+</script>
