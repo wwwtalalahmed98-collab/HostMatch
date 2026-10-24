@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-24 - Physics added, and it overturned a conclusion** (below)
 1. **2026-10-24 - The whole project in plain language** (below)
 1. **2026-10-24 - The chassis becomes an object, and the first code runs** (below)
 1. **2026-10-23 - It is a tool, and its data layer already exists** (below)
@@ -16,6 +17,92 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-24 — Physics added, and it overturned one of our own conclusions
+
+Records: [`protocol/theory-stack-v1.md`](../protocol/theory-stack-v1.md),
+[`scripts/growth_coupling.py`](../scripts/growth_coupling.py).
+Run it with `python -I scripts/growth_coupling.py`.
+
+**The instruction: stop building a tool that matches rules and ground it in the
+quantitative theory the field has established.** That is the right criticism.
+
+## What the tool was
+
+`chassis_resolve.py` is a **rule matcher**. Does this protein have cysteines,
+does it have sequons, yes or no. **It contains no rates, no energies, no
+concentrations and no dynamics.** Nothing in it could tell you how much protein
+you would get.
+
+## The six layers that would fix that
+
+| Layer | What it replaces | Status |
+|---|---|---|
+| 1a. Transcription as statistical mechanics | *"promoter works in host"*, a boolean | Partly reachable |
+| 1b. Translation initiation as free energy | *"translation initiation"*, a boolean | **No yeast model of standing exists** |
+| 1c. Elongation as particle traffic (TASEP) | *"codon usage compatible"* | Reachable |
+| **2. Growth coupling / proteome allocation** | **`proteome_budget.py` entirely** | **Built** |
+| 3. Resource competition between parts | the borrowed twelve-switch ceiling | Partly |
+| 4. Enzyme-constrained metabolism | precursor and cofactor booleans | **MATLAB** |
+| 5. Secretory pathway with costs | **the missing module costs** | **MATLAB** |
+| 6. Noise | nothing — the tool has no notion of variation | Structurally reachable |
+
+## Layer 2 was implemented, and it corrected us
+
+The growth laws say the proteome splits into sectors whose mass fractions vary
+linearly with growth rate, and that heterologous expression slows the cell. So
+yield is **per-cell protein times how fast cells accumulate**, and that product
+peaks at **half the ceiling**.
+
+| | Measured ceiling | **Actual optimum** |
+|---|---:|---:|
+| *E. coli* | 33% | **16.5%** |
+| *S. cerevisiae* | 40% | **20%** |
+
+**`proteome_budget.py` and the published simulator both treat 40% as a budget
+you may spend up to. Under the growth laws 40% is the point of ZERO yield** —
+the cell has stopped growing, so nothing accumulates.
+
+**A conclusion this project already held was wrong, and the first contact with
+the theory layer found it.** That is the strongest argument for doing the rest.
+
+## What this changes about the project's difficulty
+
+**Two of the three highest-value layers are behind MATLAB** — enzyme-constrained
+metabolism and the secretory pathway. Layer 5 in particular is **the only source
+of the module costs that `chassis-v1.json` currently records as
+`not measured`**, which is the gap that stops the budget constraint being
+checkable at all.
+
+MATLAB access has gone from an inconvenience to **the central obstacle**.
+
+## Decisions recorded
+
+| Decision | Against | Why |
+|---|---|---|
+| Build the theory stack as an architecture first | Bolting one model on opportunistically | Layers feed each other; order matters, and errors compound |
+| Implement Layer 2 first | Starting with transcription biophysics | Only layer with no blocking dependency, and it replaces the project's biggest fudge |
+| Keep the old budget script | Deleting it | It is the record of what we believed; the correction is only legible beside it |
+| State r = 0.501 as the state of the art | Quoting it as a success | It is the best published ab initio proteome prediction and it is not close to precise |
+
+## Not done
+
+- **Five of six layers unimplemented**, and no parameters collected for any.
+- **The chassis object and the simulator still show the uncorrected 40%.**
+  The correction exists in a script and has not propagated.
+- **Parameters are the real work, not the equations.** The equations are
+  published; yeast-specific values are not assembled anywhere.
+- **Errors will compound across layers** and nothing tracks that yet.
+- **Most of this theory is *E. coli*.** The growth laws, the thermodynamic
+  promoter models and the competition results are overwhelmingly bacterial, and
+  the chassis is yeast. Every transfer is an assumption.
+- **The linear growth reduction is first-order**, well supported in bacteria and
+  much less tested in yeast.
+- **No layer removes the Pichia scFv ceiling.** Two near-identical antibody
+  fragments diverged under identical engineering. More physics does not fix a
+  problem that is not a physics problem.
 
 ---
 

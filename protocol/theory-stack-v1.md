@@ -1,0 +1,245 @@
+# The theory stack, version 1
+
+**The instruction:** stop building a tool that matches rules, and ground it in
+the physics and quantitative theory the field has actually established —
+systems biology, genomics, proteomics, transcription, translation, circuit
+engineering.
+
+**This document says what those layers are, what each one would replace, and
+which are reachable.** It is an architecture, not an implementation. One layer
+has been implemented as a demonstration and it immediately corrected a
+conclusion already in the project.
+
+---
+
+## What the tool is today, stated honestly
+
+`chassis_resolve.py` is a **rule matcher**. It asks categorical questions — does
+this protein have cysteines, does it have sequons — and returns categorical
+answers. It contains **no rates, no energies, no concentrations, and no
+dynamics.** Nothing in it could tell you how much protein you would get, or how
+the cell would respond.
+
+That is the gap. Every layer below replaces a categorical answer with a
+quantitative one.
+
+---
+
+## Layer 1 — Sequence to rates: the biophysics of expression
+
+### 1a. Transcription, as statistical mechanics
+
+The level of transcription is computed as the **probability that RNA polymerase
+occupies the promoter**, from binding energies and regulator copy numbers. This
+is equilibrium statistical mechanics applied to a promoter.
+
+> *"We review a class of models (**thermodynamic models**) which exploit
+> **statistical mechanics** to compute the probability that RNA polymerase is at
+> the appropriate promoter"* — Bintu et al., *Transcriptional Regulation by the
+> Numbers*
+
+**It works in yeast specifically**, which matters because the chassis is yeast:
+
+> *"Thermodynamic models based only on the **equilibrium binding** of
+> transcription factors to DNA and to each other **captured a large fraction of
+> the variation**"* — synthetic promoter libraries in *S. cerevisiae*, *Nature* 2008
+
+And binding energies can now be predicted from sequence:
+
+> *"We use these models to predict the binding energies of transcription factor
+> binding sites to **within 1 kBT** of their measured values"*
+
+**Replaces:** capability A2, currently the boolean *"promoter works in host"*.
+**Would give:** a transcription rate from a promoter sequence and a regulator
+concentration.
+**Parameters needed:** binding energies per TF-site pair, TF copy numbers.
+Available for a modest set of yeast TFs; not for arbitrary ones.
+
+### 1b. Translation initiation, as free energy
+
+Initiation rate follows from the free-energy change of assembling the ribosome
+on the message. In bacteria this is the RBS-calculator formalism. **In yeast the
+equivalent is weaker** — Kozak context is understood qualitatively but there is
+no yeast initiation model of the same standing.
+
+**Replaces:** capability A3, currently boolean.
+**Honest status:** this is a **real gap for a yeast chassis**, not a solved
+layer to plug in.
+
+### 1c. Translation elongation, as traffic
+
+Ribosomes move along a message and can jam. The standard treatment is a
+**TASEP** — a particle-flow model from statistical physics — with codon-specific
+rates set by tRNA abundance.
+
+**Replaces:** capability A1, currently *"codon usage compatible"*.
+**Would give:** elongation rate, and warning of ribosome queueing on
+rare-codon stretches.
+
+---
+
+## Layer 2 — Resource allocation and growth coupling
+
+**This is the highest-value layer and it is the one already implemented.**
+
+The cell has one ribosome pool shared by its own genes and ours. Expressing a
+heterologous protein therefore does two things at once: it makes product, and it
+slows the cell down. The growth laws make this quantitative.
+
+> *"the proteome partitions into several **coarse-grained sectors**, with each
+> sector's total mass abundance exhibiting **positive or negative linear
+> relations with the growth rate**"* — Hui et al., *Mol Syst Biol* 2015
+
+> *"A **mechanistic link** between cellular trade-offs, gene expression and
+> growth"* — Weiße et al., *PNAS* 2015. The model that couples a synthetic
+> construct to host physiology.
+
+And parts characteristics feed straight in:
+
+> *"**RBS and Promoter Strengths Determine** the Cell-Growth-Dependent Protein
+> Mass Fractions and Their Optimal Synthesis Rates"* — *ACS Synth Biol* 2021
+
+**Replaces:** `proteome_budget.py`, which treats the cell as a box of fixed
+volume and asks only whether the modules fit.
+
+### What it corrected, immediately
+
+Implemented in `scripts/growth_coupling.py`. Growth falls roughly linearly with
+heterologous mass fraction, reaching zero at the measured ceiling. Productivity
+is the product of per-cell yield and cell accumulation, so it is maximised at
+**half the ceiling**:
+
+| | Measured ceiling | **Actual optimum** |
+|---|---:|---:|
+| *E. coli* | 33% | **16.5%** |
+| *S. cerevisiae* | 40% | **20%** |
+
+**The existing budget model and the published simulator both treat 40% as a
+budget you may spend up to. Under the growth laws, 40% is the point of zero
+yield.** A design sitting at the ceiling produces nothing, because nothing is
+growing.
+
+This is a conclusion in the project that the theory layer overturned on contact.
+
+---
+
+## Layer 3 — Resource competition inside the circuit
+
+Parts are not independent. They compete for shared machinery, so adding a
+component changes the behaviour of components already there.
+
+> *"The **transcription factor titration effect** dictates level of gene
+> expression"* — *Cell* 2014
+
+> *"despite highly specific sgRNA-promoter binding, multiple sgRNAs still
+> **interfere with one another by competing for dCas9**"*
+
+**Replaces:** the ~12-switch ceiling in `regulatory-capacity-v1.md`, which this
+project currently carries as **a number borrowed from an *E. coli* experiment**.
+A competition model would *derive* that ceiling, and derive it for yeast rather
+than importing it.
+
+**This matters more than it looks.** Two independent lines of reasoning in this
+project both landed on about twelve, and we recorded that we could not tell
+whether it was a shared cause or a coincidence. **A resource-competition model
+is exactly the thing that would settle it.**
+
+---
+
+## Layer 4 — Metabolism, under enzyme and thermodynamic constraints
+
+Flux balance analysis constrained by enzyme abundance and by the free energy of
+each reaction. This is the family `pcSecYeast` belongs to, and the 2026 work
+coupling it to machine learning:
+
+> *"a hybrid machine learning and **enzyme-constrained metabolic model** for ab
+> initio prediction of **proteome reallocation**… doubled the predictive accuracy
+> of protein abundances (Pearson r = 0.501)"*
+
+Note that number honestly: **r = 0.501 is the state of the art, and it is not
+close to precise.**
+
+**Replaces:** capabilities D4 and D5, precursor and sugar-nucleotide supply,
+currently booleans.
+**Blocked by:** MATLAB.
+
+---
+
+## Layer 5 — The secretory pathway, with costs
+
+`pcSecYeast` models translocation, folding, glycosylation and trafficking as
+enzymatic steps with turnover numbers and proteome costs.
+
+**Replaces:** the single worst gap in `chassis-v1.json` — every engineered module
+carries `cost_status: not measured`, which is why the budget constraint cannot
+be checked against a real configuration. **This layer is where those costs come
+from.**
+**Blocked by:** MATLAB.
+
+---
+
+## Layer 6 — Noise
+
+Expression is stochastic. A design that works on the population average can fail
+in most individual cells. Transcriptional bursting, intrinsic versus extrinsic
+noise, and fluctuation-dissipation relations for biochemical networks are the
+standard apparatus.
+
+**Replaces:** nothing currently in the tool, because the tool has no concept of
+variation at all.
+**Would add:** the fraction of the population that actually performs.
+
+---
+
+## Tractability, ranked honestly
+
+| Layer | Value | Blocked by | Reachable now |
+|---|---|---|---|
+| **2. Growth coupling** | **Highest — corrects a live error** | Nothing | **Done, first pass** |
+| 3. Resource competition | High — derives the twelve | Yeast parameters | Partly |
+| 1a. Transcription thermodynamics | High | TF binding energies | Partly, for known TFs |
+| 1c. Elongation / TASEP | Medium | tRNA abundances for yeast | Yes |
+| 4. Enzyme-constrained metabolism | High | **MATLAB** | No |
+| 5. Secretory costs | **Highest for the chassis** | **MATLAB** | No |
+| 1b. Yeast translation initiation | Medium | **No model of standing exists** | No |
+| 6. Noise | Lower for a first design | Parameters | Yes, structurally |
+
+**Two of the three highest-value layers are behind MATLAB.** That is now the
+central obstacle to this project, not an inconvenience.
+
+---
+
+## What this is not
+
+**This is not a weekend of work.** Each layer is a model with parameters,
+assumptions and a validity range. Done carelessly, a stack of models produces
+confident numbers with no more content than the rules they replaced — and that
+is worse than the rule matcher, because it looks authoritative.
+
+**Specific risks:**
+
+- **Parameters are the hard part, not the equations.** The equations are
+  published. Yeast-specific values for most of them are not assembled anywhere,
+  and collecting them is the actual work.
+- **Errors compound across layers.** A transcription rate feeding a translation
+  model feeding a growth model multiplies its uncertainty at each step. Nothing
+  in the plan above tracks that yet, and it must.
+- **Most of this theory was built on *E. coli*.** The growth laws, the
+  thermodynamic promoter models and the competition results are overwhelmingly
+  bacterial. **The chassis is yeast.** Every transfer is an assumption.
+- **The linear growth reduction used in Layer 2 is first-order.** It is well
+  supported in bacteria and much less tested in yeast.
+- **No layer removes the ceiling** reported in `scope-proteins-v1.md`: two
+  architecturally similar antibody fragments behaved differently under identical
+  engineering. More physics does not fix a problem that is not a physics problem.
+
+---
+
+## What is done and what is not
+
+**Done:** Layer 2, first pass, in `scripts/growth_coupling.py`. It runs, and it
+corrected the budget conclusion.
+
+**Not done:** every other layer. No parameters have been collected for any of
+them. The chassis object still carries no measured module cost. The simulator
+still displays the uncorrected 40% ceiling.
