@@ -4,6 +4,7 @@ The durable record. Newest checkpoint at the top. Each entry is written to be
 readable without the conversation it came from.
 
 ## Checkpoints
+1. **2026-10-24 - The chassis becomes an object, and the first code runs** (below)
 1. **2026-10-23 - It is a tool, and its data layer already exists** (below)
 1. **2026-10-23 - Idea sharpened: proteins, and a data-driven design layer** (below)
 1. **2026-10-21 — A candidate named: the rules choose yeast** (below)
@@ -14,6 +15,121 @@ readable without the conversation it came from.
 3. **2026-10-20 — The target is a universal chassis**
 4. **2026-10-20 — How we got here, and what HostMatch is**
 5. **2026-10-17 — The big database does not have what we needed**
+
+---
+
+# 2026-10-24 — The chassis becomes an object, and the first code runs
+
+Records: [`protocol/computational-chassis-v1.md`](../protocol/computational-chassis-v1.md),
+[`chassis/chassis-v1.json`](../chassis/chassis-v1.json),
+[`scripts/chassis_resolve.py`](../scripts/chassis_resolve.py).
+Run it with `python -I scripts/chassis_resolve.py`.
+
+**The idea was restated as "a tool that will be **the computational universal
+chassis**", and that is a different architecture from the day before.**
+
+Yesterday: a pipeline that *recommends* a chassis. Today: the chassis **is** the
+object — a machine-readable organism definition that can be queried for any
+protein. **The tool does not produce a specification. The tool is the chassis,
+and a specification is what falls out when you query it.**
+
+## Why that is not word games
+
+A recommender is a function; a chassis object is a model of an organism that is
+versioned, inspectable, citable and arguable with. Evidence attaches to each
+capability instead of being scattered through code. Others can fork and dispute
+the design itself rather than its outputs one at a time.
+
+**Genome-scale models already work this way, which is why this is the right
+framing.** pcSecYeast is exactly this shape: a curated object plus solvers.
+
+## The novelty, in one sentence
+
+**pcSecYeast models the yeast that exists. This project models the yeast that
+should exist.**
+
+pcSecYeast and `pcSecYeastSpecies` are proteome-constrained models of **extant**
+organisms. **UCP-1**, in `chassis/chassis-v1.json`, defines a universal protein
+chassis **no laboratory has built** — base organism plus five engineered modules,
+each with its published precedent, its missing cost and its confidence.
+
+That is the source of the value and of the main risk, and they are the same
+fact: **every prediction it supports is a prediction about something that does
+not exist yet.**
+
+## What now runs
+
+`chassis/chassis-v1.json` holds the base organism with its measured 40% proteome
+headroom, **22 capabilities** marked native / engineered / partly native, **5
+engineered modules** each with `cost_status: not measured`, **4 global
+constraints**, a `provenance` block pointing at every protocol file, and a
+`what_this_object_cannot_do` field so the limitations travel with the data.
+
+`scripts/chassis_resolve.py` takes a protein sequence and reports which
+capabilities go active, which are native, which need a module, and what cannot be
+concluded. **This is modules 1 and 2 of the tool spec, working, in Python, with
+no MATLAB.** It is the first part of this project that executes rather than
+describes.
+
+| | Human preproinsulin | Human erythropoietin |
+|---|---|---|
+| Capabilities active | 16 of 22 | 19 of 22 |
+| Native to yeast | 14 | 15 |
+| **Need engineering** | **2** | **4** |
+
+**The chassis configures differently for different proteins** — EPO is a
+glycosylated therapeutic, so it pulls in `MOD-glycan`, which pulls in
+`MOD-sugarnt` to feed it; insulin, with no sequons, does not. That branching is
+the behaviour the whole idea rests on, and it now happens in code.
+
+**A correctness check it passed:** EPO's N-glycosylation sequons came out at
+residues **24, 38 and 83**, the positions the literature reports. The scan is
+sequence-exact rather than predictive, so this confirms the code is right rather
+than discovering anything.
+
+## A failure worth recording
+
+The signal-peptide heuristic **first returned `False` for human preproinsulin**,
+which has a textbook signal peptide. Cause: averaging hydropathy over a fixed
+N-terminal slice dilutes the short hydrophobic h-region with the charged and
+polar regions flanking it.
+
+**The fix was principled, not fitted** — scan short windows, take the strongest,
+which is what the biology says. Preproinsulin now reads `True`, mature EPO still
+reads `False`, both correct. **The threshold was not tuned until the example
+passed**, because a constant fitted to one test case means nothing on the next
+protein. Both calls stay labelled `[HEURISTIC]` in every run; the real answers
+need SignalP and DeepTMHMM.
+
+## Decisions recorded
+
+| Decision | Against | Why |
+|---|---|---|
+| The chassis is a data object, queried | A recommender pipeline returning answers | Stated by the project owner; makes the organism design reviewable and forkable, and matches how genome-scale models work |
+| Limitations live inside the object | Limitations in separate documents only | They travel with the data, so a future reader cannot use it without seeing them |
+| Build modules 1 and 2 first, in Python | Waiting on MATLAB for module 3 | They have no blocking dependency and produce working code today |
+| Fix the heuristic by window-scanning | Lowering the threshold until insulin passed | A constant fitted to one example does not generalise |
+| State the hypothetical nature in the object | Presenting it as a model of a real organism | Nothing in it has been built; a reader must not mistake it for validated |
+
+## Not done
+
+- **No titre, yield or success probability.** Module 3 is unimplemented and gated
+  on MATLAB.
+- **No engineered module has a measured proteome cost**, so the 40% budget
+  constraint is recorded but **cannot be checked against a resolved
+  configuration**. The arithmetic that justified the architecture cannot yet be
+  run on a real answer.
+- **O-glycosylation and other PTMs return unknown**, not zero.
+- **Confidences are judgement, not calibration.**
+- **Tolerance (F3, F4) remains the least assessed area** in the project, and the
+  literature calls it the usual binding constraint.
+- **No external validation.** Two proteins chosen by the author is not a test
+  set; there is no held-out comparison against measured expression outcomes.
+- **Neither pcSecYeast nor pcSecYeastSpecies has been downloaded or run.**
+- **The object describes an organism nobody has built.** Internal consistency
+  checked; correspondence to reality not checked, and not checkable until
+  someone builds it.
+- **The repository is still named HostMatch**, from a rejected framing.
 
 ---
 
